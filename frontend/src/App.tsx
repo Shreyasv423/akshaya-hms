@@ -1,35 +1,118 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "./services/supabase";
 
-function App() {
-  const [count, setCount] = useState(0)
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+
+import PatientList from "./modules/patients/PatientList";
+import OpdDashboard from "./modules/opd/OpdDashboard";
+import IpdDashboard from "./modules/ipd/IpdDashboard";
+import DischargeDashboard from "./modules/discharge/DischargeDashboard";
+import AdminDashboard from "./modules/admin/AdminDashboard";
+import Login from "./auth/Login";
+
+export default function App() {
+  const [session, setSession] = useState<any>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+
+      if (data.session) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.session.user.id)
+          .single();
+
+        setRole(profile?.role || "reception");
+      }
+    };
+
+    init();
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (!session) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="*" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
+    );
+  }
+
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <BrowserRouter>
+ 
 
-export default App
+      <Navbar />
+
+      <div
+        style={{
+          display: "flex",
+          height: "calc(100vh - 120px)",
+          background: "#f0f9ff"
+        }}
+      >
+        <Sidebar role={role || "reception"} />
+
+        <div
+          style={{
+            flex: 1,
+            padding: 30,
+            overflowY: "auto"
+          }}
+        >
+          <Routes>
+            <Route
+  path="/"
+  element={
+    role === "admin"
+      ? <Navigate to="/admin" />
+      : role === "doctor"
+      ? <Navigate to="/opd" />
+      : <Navigate to="/patients" />
+  }
+/>
+
+
+            {role === "admin" && (
+              <Route path="/admin" element={<AdminDashboard />} />
+            )}
+
+            {(role === "admin" || role === "reception") && (
+              <>
+                <Route path="/patients" element={<PatientList />} />
+                <Route path="/opd" element={<OpdDashboard />} />
+              </>
+            )}
+
+            {role === "doctor" && (
+              <Route path="/opd" element={<OpdDashboard />} />
+            )}
+
+            {role === "admin" && (
+              <>
+                <Route path="/ipd" element={<IpdDashboard />} />
+                <Route path="/discharge" element={<DischargeDashboard />} />
+              </>
+            )}
+          </Routes>
+        </div>
+      </div>
+    </BrowserRouter>
+  );
+}

@@ -5,28 +5,25 @@ type Props = {
   onSuccess: () => void;
 };
 
-export default function AppointmentForm({ onSuccess }: Props) {
+export default function AdmissionForm({ onSuccess }: Props) {
   const [patients, setPatients] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
-  const [token, setToken] = useState<number>(1);
+  const [occupiedBeds, setOccupiedBeds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     patient_name: "",
     age: "",
     gender: "",
-    phone: "",
     doctor_name: "",
-    visit_type: "New"
+    bed_number: "",
+    diagnosis: ""
   });
 
-  /* ========================= */
-  /* Load Patients & Doctors */
-  /* ========================= */
   useEffect(() => {
     fetchPatients();
     fetchDoctors();
-    generateToken();
+    fetchOccupiedBeds();
   }, []);
 
   const fetchPatients = async () => {
@@ -47,32 +44,19 @@ export default function AppointmentForm({ onSuccess }: Props) {
     if (data) setDoctors(data);
   };
 
-  /* ========================= */
-  /* Generate Daily Token */
-  /* ========================= */
-  const generateToken = async () => {
-    const today = new Date().toISOString().split("T")[0];
-
+  const fetchOccupiedBeds = async () => {
     const { data } = await supabase
-      .from("opd_appointments")
-      .select("token_number")
-      .eq("visit_date", today);
+      .from("ipd_admissions")
+      .select("bed_number")
+      .eq("status", "Admitted");
 
-    if (data && data.length > 0) {
-      const maxToken = Math.max(
-        ...data.map((d: any) => d.token_number || 0)
-      );
-      setToken(maxToken + 1);
-    } else {
-      setToken(1);
+    if (data) {
+      setOccupiedBeds(data.map((d: any) => d.bed_number));
     }
   };
 
-  /* ========================= */
-  /* Handle Change */
-  /* ========================= */
   const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
     const { name, value } = e.target;
 
@@ -85,42 +69,34 @@ export default function AppointmentForm({ onSuccess }: Props) {
         ...form,
         patient_name: selectedPatient?.name || "",
         age: selectedPatient?.age || "",
-        gender: selectedPatient?.gender || "",
-        phone: selectedPatient?.phone || ""
+        gender: selectedPatient?.gender || ""
       });
     } else {
       setForm({ ...form, [name]: value });
     }
   };
 
-  /* ========================= */
-  /* Submit */
-  /* ========================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.patient_name || !form.doctor_name) {
-      alert("Please select patient and doctor");
+    if (occupiedBeds.includes(form.bed_number)) {
+      alert("This bed is already occupied!");
       return;
     }
 
     setLoading(true);
 
-    const today = new Date().toISOString().split("T")[0];
-
     const { error } = await supabase
-      .from("opd_appointments")
+      .from("ipd_admissions")
       .insert([
         {
           patient_name: form.patient_name,
           age: form.age ? Number(form.age) : null,
           gender: form.gender,
-          phone: form.phone,
           doctor_name: form.doctor_name,
-          visit_type: form.visit_type,
-          token_number: token,
-          visit_date: today,
-          status: "Waiting"
+          bed_number: form.bed_number,
+          diagnosis: form.diagnosis,
+          status: "Admitted"
         }
       ]);
 
@@ -134,26 +110,26 @@ export default function AppointmentForm({ onSuccess }: Props) {
       patient_name: "",
       age: "",
       gender: "",
-      phone: "",
       doctor_name: "",
-      visit_type: "New"
+      bed_number: "",
+      diagnosis: ""
     });
 
     setLoading(false);
-    generateToken();
+    fetchOccupiedBeds();
     onSuccess();
   };
 
+  const allBeds = Array.from({ length: 20 }, (_, i) => `Bed-${i + 1}`);
+  const availableBeds = allBeds.filter(
+    (bed) => !occupiedBeds.includes(bed)
+  );
+
   return (
     <div style={cardStyle}>
-      <h3 style={titleStyle}>New OPD Appointment</h3>
-
-      <div style={{ marginBottom: 15, fontWeight: 600 }}>
-        Token Number: {token}
-      </div>
+      <h3 style={titleStyle}>Admit Patient (IPD)</h3>
 
       <form onSubmit={handleSubmit} style={formStyle}>
-
         {/* Select Patient */}
         <select
           name="patient_name"
@@ -165,7 +141,7 @@ export default function AppointmentForm({ onSuccess }: Props) {
           <option value="">Select Patient</option>
           {patients.map((p) => (
             <option key={p.id} value={p.name}>
-              {p.name} ({p.phone || "No Phone"})
+              {p.name}
             </option>
           ))}
         </select>
@@ -186,17 +162,40 @@ export default function AppointmentForm({ onSuccess }: Props) {
           ))}
         </select>
 
+        {/* Select Bed */}
+        <select
+          name="bed_number"
+          value={form.bed_number}
+          onChange={handleChange}
+          required
+          style={inputStyle}
+        >
+          <option value="">Select Available Bed</option>
+          {availableBeds.map((bed) => (
+            <option key={bed} value={bed}>
+              {bed}
+            </option>
+          ))}
+        </select>
+
+        <input
+          name="diagnosis"
+          placeholder="Diagnosis"
+          value={form.diagnosis}
+          onChange={handleChange}
+          required
+          style={inputStyle}
+        />
+
         <button type="submit" style={buttonStyle} disabled={loading}>
-          {loading ? "Saving..." : "Send to OPD"}
+          {loading ? "Admitting..." : "Admit Patient"}
         </button>
       </form>
     </div>
   );
 }
 
-/* ========================= */
 /* Styles */
-/* ========================= */
 
 const cardStyle = {
   background: "white",

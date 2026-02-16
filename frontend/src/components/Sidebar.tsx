@@ -1,64 +1,116 @@
+import { NavLink } from "react-router-dom";
 import {
   Users,
   Stethoscope,
   BedDouble,
-  Building2
+  FileText
 } from "lucide-react";
 
 type Props = {
   role: string;
 };
 
-const Item = ({ label, icon }: { label: string; icon: React.ReactNode }) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      padding: "10px 14px",
-      borderRadius: 8,
-      cursor: "pointer",
-      color: "#e5e7eb"
-    }}
-    onMouseOver={e => (e.currentTarget.style.background = "#1e293b")}
-    onMouseOut={e => (e.currentTarget.style.background = "transparent")}
-  >
-    {icon}
-    <span>{label}</span>
-  </div>
-);
+const linkBase = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  padding: "10px 14px",
+  borderRadius: 8,
+  textDecoration: "none",
+  fontWeight: 500,
+  marginBottom: 6
+};
 
 export default function Sidebar({ role }: Props) {
   return (
     <div
       style={{
         width: 240,
-        background: "#020617",
+        background: "#e0f2fe",
         padding: 16,
-        color: "white"
+        borderRight: "1px solid #bae6fd",
+        display: "flex",
+        flexDirection: "column"
       }}
     >
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 18, fontWeight: 700 }}>
-          Akshaya Hospitals
-        </div>
-        <div style={{ fontSize: 13, color: "#94a3b8" }}>
-          {role.toUpperCase()}
-        </div>
+      {/* Role Badge */}
+      <div
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          marginBottom: 20,
+          color: "#0369a1"
+        }}
+      >
+        🔐 Role: {role?.toUpperCase()}
       </div>
 
-      <Item label="Patients" icon={<Users size={18} />} />
+      {/* ADMIN + RECEPTION */}
+      {(role === "admin" || role === "reception") && (
+        <>
+          <NavLink
+            to="/patients"
+            style={({ isActive }) => ({
+              ...linkBase,
+              background: isActive ? "#bae6fd" : "transparent",
+              color: "#0c4a6e"
+            })}
+          >
+            <Users size={18} /> Patients
+          </NavLink>
 
-      {(role === "admin" || role === "doctor" || role === "reception") && (
-        <Item label="OPD" icon={<Stethoscope size={18} />} />
+          <NavLink
+            to="/opd"
+            style={({ isActive }) => ({
+              ...linkBase,
+              background: isActive ? "#bae6fd" : "transparent",
+              color: "#0c4a6e"
+            })}
+          >
+            <Stethoscope size={18} /> OPD
+          </NavLink>
+        </>
       )}
 
-      {(role === "admin" || role === "doctor" || role === "nurse") && (
-        <Item label="IPD" icon={<BedDouble size={18} />} />
+      {/* DOCTOR ONLY OPD */}
+      {role === "doctor" && (
+        <NavLink
+          to="/opd"
+          style={({ isActive }) => ({
+            ...linkBase,
+            background: isActive ? "#bae6fd" : "transparent",
+            color: "#0c4a6e"
+          })}
+        >
+          <Stethoscope size={18} /> OPD
+        </NavLink>
       )}
 
-      {(role === "admin" || role === "hr") && (
-        <Item label="HR" icon={<Building2 size={18} />} />
+      {/* ADMIN ONLY */}
+      {role === "admin" && (
+        <>
+          <NavLink
+            to="/ipd"
+            style={({ isActive }) => ({
+              ...linkBase,
+              background: isActive ? "#bae6fd" : "transparent",
+              color: "#0c4a6e"
+            })}
+          >
+            <BedDouble size={18} /> IPD
+          </NavLink>
+
+          <NavLink
+            to="/discharge"
+            style={({ isActive }) => ({
+              ...linkBase,
+              background: isActive ? "#bae6fd" : "transparent",
+              color: "#0c4a6e"
+            })}
+          >
+            <FileText size={18} /> Discharge
+          </NavLink>
+        </>
       )}
     </div>
   );
