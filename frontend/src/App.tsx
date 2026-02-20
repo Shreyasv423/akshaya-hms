@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./services/supabase";
 
 import Navbar from "./components/Navbar";
@@ -13,7 +14,7 @@ import AdminDashboard from "./modules/admin/AdminDashboard";
 import Login from "./auth/Login";
 
 export default function App() {
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {

@@ -13,18 +13,19 @@ export default function OpdBilling() {
   const [fee, setFee] = useState<number>(0);
   const [paymentMode, setPaymentMode] = useState("Cash");
 
-  useEffect(() => {
-    fetchCompletedAppointments();
-  }, []);
-
-  const fetchCompletedAppointments = async () => {
+  async function fetchCompletedAppointments() {
     const { data } = await supabase
       .from("opd_appointments")
       .select("id, patient_name, doctor_name")
       .eq("status", "Completed");
 
     setAppointments(data || []);
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchCompletedAppointments();
+  }, []);
 
   const fetchFee = async (appointmentId: string, doctorName: string) => {
     setSelected(appointmentId);
