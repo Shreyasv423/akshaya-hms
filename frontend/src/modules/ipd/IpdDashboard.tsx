@@ -31,7 +31,8 @@ export default function IpdDashboard() {
   };
 
   useEffect(() => {
-    fetchAdmissions();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchAdmissions();
   }, []);
 
   return (

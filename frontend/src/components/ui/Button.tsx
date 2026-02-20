@@ -1,7 +1,10 @@
+import type { ComponentProps } from "react";
 import { motion } from "framer-motion";
 
+type Props = ComponentProps<typeof motion.button>;
+
 export default function Button(
-  props: React.ButtonHTMLAttributes<HTMLButtonElement>
+  props: Props
 ) {
   return (
     <motion.button

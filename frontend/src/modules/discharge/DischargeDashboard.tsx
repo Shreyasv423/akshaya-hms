@@ -29,7 +29,8 @@ export default function DischargeDashboard() {
   };
 
   useEffect(() => {
-    fetchDischarges();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchDischarges();
   }, []);
 
   const filteredDischarges = useMemo(() => {

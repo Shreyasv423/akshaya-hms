@@ -5,9 +5,25 @@ type Props = {
   onSuccess: () => void;
 };
 
+type Patient = {
+  id: string;
+  name: string;
+  age: number;
+  gender: string;
+};
+
+type Doctor = {
+  id: string;
+  name: string;
+};
+
+type OccupiedBed = {
+  bed_number: string;
+};
+
 export default function AdmissionForm({ onSuccess }: Props) {
-  const [patients, setPatients] = useState<any[]>([]);
-  const [doctors, setDoctors] = useState<any[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [occupiedBeds, setOccupiedBeds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -20,40 +36,41 @@ export default function AdmissionForm({ onSuccess }: Props) {
     diagnosis: ""
   });
 
-  useEffect(() => {
-    fetchPatients();
-    fetchDoctors();
-    fetchOccupiedBeds();
-  }, []);
-
-  const fetchPatients = async () => {
+  async function fetchPatients() {
     const { data } = await supabase
       .from("patients")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (data) setPatients(data);
-  };
+  }
 
-  const fetchDoctors = async () => {
+  async function fetchDoctors() {
     const { data } = await supabase
       .from("doctors")
       .select("*")
       .eq("is_active", true);
 
     if (data) setDoctors(data);
-  };
+  }
 
-  const fetchOccupiedBeds = async () => {
+  async function fetchOccupiedBeds() {
     const { data } = await supabase
       .from("ipd_admissions")
       .select("bed_number")
       .eq("status", "Admitted");
 
     if (data) {
-      setOccupiedBeds(data.map((d: any) => d.bed_number));
+      setOccupiedBeds((data as OccupiedBed[]).map((d) => d.bed_number));
     }
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchPatients();
+    void fetchDoctors();
+    void fetchOccupiedBeds();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
@@ -68,7 +85,7 @@ export default function AdmissionForm({ onSuccess }: Props) {
       setForm({
         ...form,
         patient_name: selectedPatient?.name || "",
-        age: selectedPatient?.age || "",
+        age: String(selectedPatient?.age ?? ""),
         gender: selectedPatient?.gender || ""
       });
     } else {

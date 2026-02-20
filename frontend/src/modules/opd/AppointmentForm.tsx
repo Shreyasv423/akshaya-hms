@@ -5,9 +5,26 @@ type Props = {
   onSuccess: () => void;
 };
 
+type Patient = {
+  id: string;
+  name: string;
+  age: number;
+  gender: string;
+  phone?: string;
+};
+
+type Doctor = {
+  id: string;
+  name: string;
+};
+
+type TokenRow = {
+  token_number: number;
+};
+
 export default function AppointmentForm({ onSuccess }: Props) {
-  const [patients, setPatients] = useState<any[]>([]);
-  const [doctors, setDoctors] = useState<any[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [token, setToken] = useState<number>(1);
   const [loading, setLoading] = useState(false);
 
@@ -20,37 +37,28 @@ export default function AppointmentForm({ onSuccess }: Props) {
     visit_type: "New"
   });
 
-  /* ========================= */
-  /* Load Patients & Doctors */
-  /* ========================= */
-  useEffect(() => {
-    fetchPatients();
-    fetchDoctors();
-    generateToken();
-  }, []);
-
-  const fetchPatients = async () => {
+  async function fetchPatients() {
     const { data } = await supabase
       .from("patients")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (data) setPatients(data);
-  };
+  }
 
-  const fetchDoctors = async () => {
+  async function fetchDoctors() {
     const { data } = await supabase
       .from("doctors")
       .select("*")
       .eq("is_active", true);
 
     if (data) setDoctors(data);
-  };
+  }
 
   /* ========================= */
   /* Generate Daily Token */
   /* ========================= */
-  const generateToken = async () => {
+  async function generateToken() {
     const today = new Date().toISOString().split("T")[0];
 
     const { data } = await supabase
@@ -60,13 +68,23 @@ export default function AppointmentForm({ onSuccess }: Props) {
 
     if (data && data.length > 0) {
       const maxToken = Math.max(
-        ...data.map((d: any) => d.token_number || 0)
+        ...(data as TokenRow[]).map((d) => d.token_number || 0)
       );
       setToken(maxToken + 1);
     } else {
       setToken(1);
     }
-  };
+  }
+
+  /* ========================= */
+  /* Load Patients & Doctors */
+  /* ========================= */
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchPatients();
+    void fetchDoctors();
+    void generateToken();
+  }, []);
 
   /* ========================= */
   /* Handle Change */
@@ -84,7 +102,7 @@ export default function AppointmentForm({ onSuccess }: Props) {
       setForm({
         ...form,
         patient_name: selectedPatient?.name || "",
-        age: selectedPatient?.age || "",
+        age: String(selectedPatient?.age ?? ""),
         gender: selectedPatient?.gender || "",
         phone: selectedPatient?.phone || ""
       });

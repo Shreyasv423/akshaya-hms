@@ -6,11 +6,7 @@ export default function AdminDashboard() {
   const [opdToday, setOpdToday] = useState(0);
   const [revenueToday, setRevenueToday] = useState(0);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
+  async function fetchStats() {
     const today = new Date().toISOString().split("T")[0];
 
     // Total Patients
@@ -38,7 +34,12 @@ export default function AdminDashboard() {
     setTotalPatients(patientCount || 0);
     setOpdToday(opdData?.length || 0);
     setRevenueToday(revenue);
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchStats();
+  }, []);
 
   return (
     <div>

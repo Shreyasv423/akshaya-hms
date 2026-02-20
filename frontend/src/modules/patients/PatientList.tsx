@@ -29,7 +29,8 @@ export default function PatientList() {
   }
 
   useEffect(() => {
-    loadPatients();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadPatients();
   }, []);
 
   return (
