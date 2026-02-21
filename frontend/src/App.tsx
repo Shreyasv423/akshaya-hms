@@ -11,14 +11,15 @@ import OpdDashboard from "./modules/opd/OpdDashboard";
 import IpdDashboard from "./modules/ipd/IpdDashboard";
 import DischargeDashboard from "./modules/discharge/DischargeDashboard";
 import AdminDashboard from "./modules/admin/AdminDashboard";
+import BillingSettings from "./modules/admin/BillingSettings";
 import Login from "./auth/Login";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<string>("reception");
 
   useEffect(() => {
-    const init = async () => {
+    const initialize = async () => {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
 
@@ -33,17 +34,18 @@ export default function App() {
       }
     };
 
-    init();
+    initialize();
 
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  // If not logged in → show login only
   if (!session) {
     return (
       <BrowserRouter>
@@ -54,21 +56,18 @@ export default function App() {
     );
   }
 
-
   return (
     <BrowserRouter>
- 
-
       <Navbar />
 
       <div
         style={{
           display: "flex",
-          height: "calc(100vh - 120px)",
-          background: "#f0f9ff"
+          height: "calc(100vh - 85px)", // match navbar height
+          background: "#f8fafc"
         }}
       >
-        <Sidebar role={role || "reception"} />
+        <Sidebar role={role} />
 
         <div
           style={{
@@ -78,22 +77,30 @@ export default function App() {
           }}
         >
           <Routes>
+
+            {/* Default Redirect Based on Role */}
             <Route
-  path="/"
-  element={
-    role === "admin"
-      ? <Navigate to="/admin" />
-      : role === "doctor"
-      ? <Navigate to="/opd" />
-      : <Navigate to="/patients" />
-  }
-/>
+              path="/"
+              element={
+                role === "admin"
+                  ? <Navigate to="/admin" />
+                  : role === "doctor"
+                  ? <Navigate to="/opd" />
+                  : <Navigate to="/patients" />
+              }
+            />
 
-
+            {/* Admin Routes */}
             {role === "admin" && (
-              <Route path="/admin" element={<AdminDashboard />} />
+              <>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/settings" element={<BillingSettings />} />
+                <Route path="/ipd" element={<IpdDashboard />} />
+                <Route path="/discharge" element={<DischargeDashboard />} />
+              </>
             )}
 
+            {/* Reception + Admin */}
             {(role === "admin" || role === "reception") && (
               <>
                 <Route path="/patients" element={<PatientList />} />
@@ -101,16 +108,14 @@ export default function App() {
               </>
             )}
 
+            {/* Doctor Only */}
             {role === "doctor" && (
               <Route path="/opd" element={<OpdDashboard />} />
             )}
 
-            {role === "admin" && (
-              <>
-                <Route path="/ipd" element={<IpdDashboard />} />
-                <Route path="/discharge" element={<DischargeDashboard />} />
-              </>
-            )}
+            {/* Catch All */}
+            <Route path="*" element={<Navigate to="/" />} />
+
           </Routes>
         </div>
       </div>

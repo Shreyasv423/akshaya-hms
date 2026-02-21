@@ -10,105 +10,103 @@ type Props = {
   role: string;
 };
 
-const linkBase = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  padding: "10px 14px",
-  borderRadius: 8,
-  textDecoration: "none",
-  fontWeight: 500,
-  marginBottom: 6
-};
-
 export default function Sidebar({ role }: Props) {
+  const linkStyle = (isActive: boolean) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "12px 18px",
+    borderRadius: 12,
+    fontWeight: 500,
+    fontSize: 14,
+    marginBottom: 10,
+    textDecoration: "none",
+    transition: "all 0.2s ease",
+    background: isActive ? "#ecfdf5" : "transparent",
+    color: isActive ? "#047857" : "#334155",
+    borderLeft: isActive ? "4px solid #10b981" : "4px solid transparent",
+    cursor: "pointer"
+  });
+
+  const containerStyle = {
+    width: 260,
+    minHeight: "100vh",
+    background: "#ffffff",
+    padding: 24,
+    borderRight: "1px solid #e2e8f0",
+    display: "flex",
+    flexDirection: "column" as const
+  };
+
+  const roleBadge = {
+    fontSize: 12,
+    fontWeight: 600,
+    marginBottom: 30,
+    padding: "6px 12px",
+    borderRadius: 20,
+    background: "#f1f5f9",
+    color: "#475569",
+    width: "fit-content"
+  };
+
   return (
-    <div
-      style={{
-        width: 240,
-        background: "#e0f2fe",
-        padding: 16,
-        borderRight: "1px solid #bae6fd",
-        display: "flex",
-        flexDirection: "column"
-      }}
-    >
-      {/* Role Badge */}
-      <div
-        style={{
-          fontSize: 13,
-          fontWeight: 600,
-          marginBottom: 20,
-          color: "#0369a1"
-        }}
-      >
-        🔐 Role: {role?.toUpperCase()}
+    <div style={containerStyle}>
+      {/* Role */}
+      <div style={roleBadge}>
+        🔐 {role?.toUpperCase()}
       </div>
 
-      {/* ADMIN + RECEPTION */}
       {(role === "admin" || role === "reception") && (
         <>
-          <NavLink
-            to="/patients"
-            style={({ isActive }) => ({
-              ...linkBase,
-              background: isActive ? "#bae6fd" : "transparent",
-              color: "#0c4a6e"
-            })}
-          >
-            <Users size={18} /> Patients
+          <NavLink to="/patients" style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <div style={linkStyle(isActive)}>
+                <Users size={18} />
+                Patients
+              </div>
+            )}
           </NavLink>
 
-          <NavLink
-            to="/opd"
-            style={({ isActive }) => ({
-              ...linkBase,
-              background: isActive ? "#bae6fd" : "transparent",
-              color: "#0c4a6e"
-            })}
-          >
-            <Stethoscope size={18} /> OPD
+          <NavLink to="/opd" style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <div style={linkStyle(isActive)}>
+                <Stethoscope size={18} />
+                OPD
+              </div>
+            )}
           </NavLink>
         </>
       )}
 
-      {/* DOCTOR ONLY OPD */}
       {role === "doctor" && (
-        <NavLink
-          to="/opd"
-          style={({ isActive }) => ({
-            ...linkBase,
-            background: isActive ? "#bae6fd" : "transparent",
-            color: "#0c4a6e"
-          })}
-        >
-          <Stethoscope size={18} /> OPD
+        <NavLink to="/opd" style={{ textDecoration: "none" }}>
+          {({ isActive }) => (
+            <div style={linkStyle(isActive)}>
+              <Stethoscope size={18} />
+              OPD
+            </div>
+          )}
         </NavLink>
       )}
 
-      {/* ADMIN ONLY */}
       {role === "admin" && (
         <>
-          <NavLink
-            to="/ipd"
-            style={({ isActive }) => ({
-              ...linkBase,
-              background: isActive ? "#bae6fd" : "transparent",
-              color: "#0c4a6e"
-            })}
-          >
-            <BedDouble size={18} /> IPD
+          <NavLink to="/ipd" style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <div style={linkStyle(isActive)}>
+                <BedDouble size={18} />
+                IPD
+              </div>
+            )}
           </NavLink>
-
-          <NavLink
-            to="/discharge"
-            style={({ isActive }) => ({
-              ...linkBase,
-              background: isActive ? "#bae6fd" : "transparent",
-              color: "#0c4a6e"
-            })}
-          >
-            <FileText size={18} /> Discharge
+          
+          <NavLink to="/discharge" style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <div style={linkStyle(isActive)}>
+                <FileText size={18} />
+                Discharge
+              </div>
+            )}
           </NavLink>
         </>
       )}

@@ -17,105 +17,68 @@ type Doctor = {
   name: string;
 };
 
-type OccupiedBed = {
+type Bed = {
+  id: string;
   bed_number: string;
+  ward: string;
 };
 
 export default function AdmissionForm({ onSuccess }: Props) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [occupiedBeds, setOccupiedBeds] = useState<string[]>([]);
+  const [beds, setBeds] = useState<Bed[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    patient_name: "",
-    age: "",
-    gender: "",
-    doctor_name: "",
-    bed_number: "",
-    diagnosis: ""
-  });
+  const [patientId, setPatientId] = useState("");
+  const [doctorId, setDoctorId] = useState("");
+  const [bedId, setBedId] = useState("");
+  const [diagnosis, setDiagnosis] = useState("");
 
-  async function fetchPatients() {
-    const { data } = await supabase
-      .from("patients")
-      .select("*")
-      .order("created_at", { ascending: false });
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    if (data) setPatients(data);
-  }
-
-  async function fetchDoctors() {
-    const { data } = await supabase
+  async function fetchData() {
+    const { data: p } = await supabase.from("patients").select("*");
+    const { data: d } = await supabase
       .from("doctors")
       .select("*")
       .eq("is_active", true);
+    const { data: b } = await supabase
+      .from("beds")
+      .select("*")
+      .eq("is_occupied", false);
 
-    if (data) setDoctors(data);
+    setPatients(p || []);
+    setDoctors(d || []);
+    setBeds(b || []);
   }
-
-  async function fetchOccupiedBeds() {
-    const { data } = await supabase
-      .from("ipd_admissions")
-      .select("bed_number")
-      .eq("status", "Admitted");
-
-    if (data) {
-      setOccupiedBeds((data as OccupiedBed[]).map((d) => d.bed_number));
-    }
-  }
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void fetchPatients();
-    void fetchDoctors();
-    void fetchOccupiedBeds();
-  }, []);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
-  ) => {
-    const { name, value } = e.target;
-
-    if (name === "patient_name") {
-      const selectedPatient = patients.find(
-        (p) => p.name === value
-      );
-
-      setForm({
-        ...form,
-        patient_name: selectedPatient?.name || "",
-        age: String(selectedPatient?.age ?? ""),
-        gender: selectedPatient?.gender || ""
-      });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (occupiedBeds.includes(form.bed_number)) {
-      alert("This bed is already occupied!");
+    if (!patientId || !doctorId || !bedId) {
+      alert("Please fill all fields");
       return;
     }
 
     setLoading(true);
 
-    const { error } = await supabase
-      .from("ipd_admissions")
-      .insert([
-        {
-          patient_name: form.patient_name,
-          age: form.age ? Number(form.age) : null,
-          gender: form.gender,
-          doctor_name: form.doctor_name,
-          bed_number: form.bed_number,
-          diagnosis: form.diagnosis,
-          status: "Admitted"
-        }
-      ]);
+    const patient = patients.find(p => p.id === patientId);
+    const doctor = doctors.find(d => d.id === doctorId);
+    const bed = beds.find(b => b.id === bedId);
+
+    const { error } = await supabase.from("ipd_admissions").insert({
+      patient_id: patientId,
+      doctor_id: doctorId,
+      patient_name: patient?.name,
+      doctor_name: doctor?.name,
+      age: patient?.age,
+      gender: patient?.gender,
+      bed_number: bed?.bed_number,
+      diagnosis,
+      status: "Admitted"
+    });
 
     if (error) {
       alert(error.message);
@@ -123,88 +86,58 @@ export default function AdmissionForm({ onSuccess }: Props) {
       return;
     }
 
-    setForm({
-      patient_name: "",
-      age: "",
-      gender: "",
-      doctor_name: "",
-      bed_number: "",
-      diagnosis: ""
-    });
+    await supabase
+      .from("beds")
+      .update({ is_occupied: true })
+      .eq("id", bedId);
 
+    setPatientId("");
+    setDoctorId("");
+    setBedId("");
+    setDiagnosis("");
     setLoading(false);
-    fetchOccupiedBeds();
+
+    fetchData();
     onSuccess();
   };
 
-  const allBeds = Array.from({ length: 20 }, (_, i) => `Bed-${i + 1}`);
-  const availableBeds = allBeds.filter(
-    (bed) => !occupiedBeds.includes(bed)
-  );
-
   return (
-    <div style={cardStyle}>
-      <h3 style={titleStyle}>Admit Patient (IPD)</h3>
+    <div style={card}>
+      <h3 style={title}>Admit Patient</h3>
 
-      <form onSubmit={handleSubmit} style={formStyle}>
-        {/* Select Patient */}
-        <select
-          name="patient_name"
-          value={form.patient_name}
-          onChange={handleChange}
-          required
-          style={inputStyle}
-        >
+      <form onSubmit={handleSubmit} style={form}>
+        <select value={patientId} onChange={e => setPatientId(e.target.value)} style={input} required>
           <option value="">Select Patient</option>
-          {patients.map((p) => (
-            <option key={p.id} value={p.name}>
-              {p.name}
-            </option>
+          {patients.map(p => (
+            <option key={p.id} value={p.id}>{p.name}</option>
           ))}
         </select>
 
-        {/* Select Doctor */}
-        <select
-          name="doctor_name"
-          value={form.doctor_name}
-          onChange={handleChange}
-          required
-          style={inputStyle}
-        >
+        <select value={doctorId} onChange={e => setDoctorId(e.target.value)} style={input} required>
           <option value="">Select Doctor</option>
-          {doctors.map((d) => (
-            <option key={d.id} value={d.name}>
-              {d.name}
-            </option>
+          {doctors.map(d => (
+            <option key={d.id} value={d.id}>{d.name}</option>
           ))}
         </select>
 
-        {/* Select Bed */}
-        <select
-          name="bed_number"
-          value={form.bed_number}
-          onChange={handleChange}
-          required
-          style={inputStyle}
-        >
+        <select value={bedId} onChange={e => setBedId(e.target.value)} style={input} required>
           <option value="">Select Available Bed</option>
-          {availableBeds.map((bed) => (
-            <option key={bed} value={bed}>
-              {bed}
+          {beds.map(b => (
+            <option key={b.id} value={b.id}>
+              Bed {b.bed_number} ({b.ward})
             </option>
           ))}
         </select>
 
         <input
-          name="diagnosis"
           placeholder="Diagnosis"
-          value={form.diagnosis}
-          onChange={handleChange}
+          value={diagnosis}
+          onChange={e => setDiagnosis(e.target.value)}
+          style={input}
           required
-          style={inputStyle}
         />
 
-        <button type="submit" style={buttonStyle} disabled={loading}>
+        <button type="submit" disabled={loading} style={button}>
           {loading ? "Admitting..." : "Admit Patient"}
         </button>
       </form>
@@ -212,37 +145,31 @@ export default function AdmissionForm({ onSuccess }: Props) {
   );
 }
 
-/* Styles */
-
-const cardStyle = {
-  background: "white",
-  padding: 28,
-  borderRadius: 16,
-  boxShadow: "0 8px 20px rgba(14,165,233,0.08)",
-  border: "1px solid #e0f2fe",
-  marginTop: 30
+const card = {
+  background: "#ffffff",
+  padding: 24,
+  borderRadius: 14,
+  boxShadow: "0 6px 16px rgba(0,0,0,0.05)"
 };
 
-const titleStyle = {
-  marginBottom: 20,
-  color: "#0c4a6e",
-  fontWeight: 600
+const title = {
+  marginBottom: 16,
+  fontWeight: 600,
+  color: "#0c4a6e"
 };
 
-const formStyle = {
+const form = {
   display: "grid",
   gap: 14
 };
 
-const inputStyle = {
+const input = {
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #cbd5e1",
-  fontSize: 14
+  border: "1px solid #cbd5e1"
 };
 
-const buttonStyle = {
-  marginTop: 10,
+const button = {
   padding: "10px 14px",
   background: "#0ea5e9",
   color: "white",

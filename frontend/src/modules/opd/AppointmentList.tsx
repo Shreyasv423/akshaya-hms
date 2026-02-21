@@ -1,178 +1,188 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { supabase } from "../../services/supabase";
-import ConsultationForm from "./ConsultationForm";
-
-type Appointment = {
-  id: string;
-  patient_name: string;
-  age: number;
-  phone: string;
-  doctor_name: string;
-  token_number: number;
-  status: string;
-  visit_date: string;
-};
+import type { Appointment } from "./OpdDashboard";
+import OpdBillingModal from "./OpdBillingModal";
 
 type Props = {
   appointments: Appointment[];
   refresh: () => void;
 };
 
-export default function AppointmentList({
-  appointments,
-  refresh
-}: Props) {
+export default function AppointmentList({ appointments, refresh }: Props) {
   const [selectedAppointment, setSelectedAppointment] =
-    useState<string | null>(null);
+    useState<Appointment | null>(null);
 
-  const [search, setSearch] = useState("");
+  const [showBilling, setShowBilling] = useState(false);
 
-  const filteredAppointments = useMemo(() => {
-    return appointments.filter(
-      (a) =>
-        a.patient_name.toLowerCase().includes(search.toLowerCase()) ||
-        a.phone?.includes(search) ||
-        String(a.token_number).includes(search)
-    );
-  }, [appointments, search]);
-
-  const markComplete = async (id: string) => {
-    await supabase
+  const updateStatus = async (id: string, status: string) => {
+    const { error } = await supabase
       .from("opd_appointments")
-      .update({ status: "Completed" })
+      .update({ status })
       .eq("id", id);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
     refresh();
   };
 
   return (
     <div style={{ marginTop: 30 }}>
-      <h3 style={headingStyle}>
-        OPD Appointments ({filteredAppointments.length})
+      <h3 style={{ fontWeight: 600 }}>
+        Appointments ({appointments.length})
       </h3>
 
-      <input
-        placeholder="Search by Name / Phone / Token"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={searchStyle}
-      />
+      <table style={table}>
+        <thead>
+          <tr style={thead}>
+            <th style={th}>Token</th>
+            <th style={th}>Patient</th>
+            <th style={th}>Doctor</th>
+            <th style={th}>Status</th>
+            <th style={th}>Actions</th>
+          </tr>
+        </thead>
 
-      <div style={{ display: "grid", gap: 16 }}>
-        {filteredAppointments.length === 0 && (
-          <div style={{ color: "#64748b" }}>
-            No appointments found.
+        <tbody>
+          {appointments.map((appt) => (
+            <tr key={appt.id}>
+              <td style={td}>{appt.token_number}</td>
+              <td style={td}>{appt.patient_name}</td>
+              <td style={td}>{appt.doctor_name}</td>
+
+              <td style={td}>
+                <span style={statusBadge(appt.status)}>
+                  {appt.status}
+                </span>
+              </td>
+
+              <td style={td}>
+                {appt.status === "Waiting" && (
+                  <button
+                    style={startBtn}
+                    onClick={() =>
+                      updateStatus(appt.id, "In Consultation")
+                    }
+                  >
+                    Start
+                  </button>
+                )}
+
+                {appt.status === "In Consultation" && (
+                  <button
+                    style={completeBtn}
+                    onClick={() =>
+                      updateStatus(appt.id, "Completed")
+                    }
+                  >
+                    Complete
+                  </button>
+                )}
+
+                {appt.status === "Completed" && (
+                  <button
+                    style={billBtn}
+                    onClick={() => {
+                      setSelectedAppointment(appt);
+                      setShowBilling(true);
+                    }}
+                  >
+                    Generate Bill
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Billing Modal */}
+      {showBilling && selectedAppointment && (
+        <div style={overlay}>
+          <div style={modal}>
+            <OpdBillingModal
+              patient={selectedAppointment}
+              onClose={() => setShowBilling(false)}
+            />
           </div>
-        )}
-
-        {filteredAppointments.map((a) => (
-          <div key={a.id} style={cardStyle}>
-            <div style={topRow}>
-              <div>
-                <div style={nameStyle}>
-                  #{a.token_number} - {a.patient_name}
-                </div>
-
-                <div style={subText}>
-                  Age: {a.age} | Doctor: {a.doctor_name}
-                </div>
-              </div>
-
-              <div style={statusBadge(a.status)}>
-                {a.status}
-              </div>
-            </div>
-
-            {a.status === "Waiting" && (
-              <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
-                <button
-                  style={buttonStyle}
-                  onClick={() => setSelectedAppointment(a.id)}
-                >
-                  Start Consultation
-                </button>
-
-                <button
-                  style={completeButton}
-                  onClick={() => markComplete(a.id)}
-                >
-                  Mark Complete
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {selectedAppointment && (
-        <ConsultationForm
-          appointmentId={selectedAppointment}
-          onClose={() => setSelectedAppointment(null)}
-          onSuccess={refresh}
-        />
+        </div>
       )}
     </div>
   );
 }
 
-/* Styles */
+/* ================= Styles ================= */
 
-const headingStyle = {
-  color: "#0c4a6e",
-  marginBottom: 20,
-  fontWeight: 600
+const table = {
+  width: "100%",
+  borderCollapse: "collapse" as const,
+  marginTop: 15
 };
 
-const cardStyle = {
-  background: "white",
-  padding: 20,
-  borderRadius: 14,
-  boxShadow: "0 6px 16px rgba(14,165,233,0.08)",
-  border: "1px solid #e0f2fe"
+const thead = {
+  background: "#f1f5f9"
 };
 
-const topRow = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center"
+const th = {
+  padding: 12,
+  textAlign: "left" as const,
+  fontSize: 14,
+  color: "#475569"
 };
 
-const nameStyle = {
-  fontSize: 16,
-  fontWeight: 600,
-  color: "#0c4a6e"
+const td = {
+  padding: 12,
+  borderBottom: "1px solid #e2e8f0"
 };
 
-const subText = {
-  fontSize: 13,
-  color: "#64748b",
-  marginTop: 4
+const startBtn = {
+  padding: "6px 10px",
+  background: "#f59e0b",
+  color: "white",
+  border: "none",
+  borderRadius: 6,
+  cursor: "pointer",
+  marginRight: 8
 };
 
-const buttonStyle = {
-  padding: "8px 12px",
+const completeBtn = {
+  padding: "6px 10px",
+  background: "#16a34a",
+  color: "white",
+  border: "none",
+  borderRadius: 6,
+  cursor: "pointer",
+  marginRight: 8
+};
+
+const billBtn = {
+  padding: "6px 10px",
   background: "#0ea5e9",
   color: "white",
   border: "none",
-  borderRadius: 8,
+  borderRadius: 6,
   cursor: "pointer"
 };
 
-const completeButton = {
-  padding: "8px 12px",
-  background: "#22c55e",
-  color: "white",
-  border: "none",
-  borderRadius: 8,
-  cursor: "pointer"
+const overlay = {
+  position: "fixed" as const,
+  inset: 0,
+  background: "rgba(0,0,0,0.4)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000
 };
 
-const searchStyle = {
-  padding: "10px 12px",
-  borderRadius: 8,
-  border: "1px solid #cbd5e1",
-  marginBottom: 20,
-  width: "100%"
+const modal = {
+  background: "white",
+  padding: 30,
+  borderRadius: 14,
+  width: 650,
+  maxHeight: "90vh",
+  overflowY: "auto" as const
 };
 
 const statusBadge = (status: string) => ({
@@ -182,10 +192,14 @@ const statusBadge = (status: string) => ({
   fontWeight: 600,
   background:
     status === "Waiting"
-      ? "#dbeafe"
+      ? "#fef3c7"
+      : status === "In Consultation"
+      ? "#e0f2fe"
       : "#dcfce7",
   color:
     status === "Waiting"
-      ? "#1d4ed8"
+      ? "#b45309"
+      : status === "In Consultation"
+      ? "#0369a1"
       : "#166534"
 });

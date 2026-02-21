@@ -1,10 +1,9 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
 import AdmissionForm from "./AdmissionForm";
 import AdmissionList from "./AdmissionList";
 
 export type Admission = {
-  admission_date: ReactNode;
   id: string;
   patient_name: string;
   age: number | null;
@@ -13,6 +12,7 @@ export type Admission = {
   bed_number: string;
   diagnosis: string;
   status: string;
+  admission_date: string;
   created_at: string;
 };
 
@@ -25,47 +25,28 @@ export default function IpdDashboard() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (data) {
-      setAdmissions(data as Admission[]);
-    }
+    if (data) setAdmissions(data as Admission[]);
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void fetchAdmissions();
+    fetchAdmissions();
   }, []);
 
   return (
     <div>
-      <h2 style={headingStyle}>IPD Management</h2>
+      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20 }}>
+        IPD Management
+      </h2>
 
-      <div style={layoutStyle}>
-        {/* Left Side Form */}
+      <div style={{ display: "flex", gap: 30 }}>
         <div style={{ flex: 1 }}>
           <AdmissionForm onSuccess={fetchAdmissions} />
         </div>
 
-        {/* Right Side List */}
         <div style={{ flex: 2 }}>
-          <AdmissionList
-            admissions={admissions}
-            refresh={fetchAdmissions}
-          />
+          <AdmissionList admissions={admissions} refresh={fetchAdmissions} />
         </div>
       </div>
     </div>
   );
 }
-
-const headingStyle = {
-  fontSize: 22,
-  fontWeight: 700,
-  color: "#0c4a6e",
-  marginBottom: 20
-};
-
-const layoutStyle = {
-  display: "flex",
-  gap: 30,
-  alignItems: "flex-start"
-};

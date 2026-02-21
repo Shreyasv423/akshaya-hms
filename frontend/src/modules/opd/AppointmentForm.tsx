@@ -5,251 +5,183 @@ type Props = {
   onSuccess: () => void;
 };
 
-type Patient = {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-  phone?: string;
-};
-
-type Doctor = {
-  id: string;
-  name: string;
-};
-
-type TokenRow = {
-  token_number: number;
-};
-
 export default function AppointmentForm({ onSuccess }: Props) {
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [token, setToken] = useState<number>(1);
-  const [loading, setLoading] = useState(false);
+  const [patients, setPatients] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [selectedPatientId, setSelectedPatientId] = useState("");
+  const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const [form, setForm] = useState({
-    patient_name: "",
-    age: "",
-    gender: "",
-    phone: "",
-    doctor_name: "",
-    visit_type: "New"
-  });
+  useEffect(() => {
+    fetchPatients();
+    fetchDoctors();
+  }, []);
 
-  async function fetchPatients() {
+  const fetchPatients = async () => {
     const { data } = await supabase
       .from("patients")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (data) setPatients(data);
-  }
+    setPatients(data || []);
+  };
 
-  async function fetchDoctors() {
+  const fetchDoctors = async () => {
     const { data } = await supabase
       .from("doctors")
       .select("*")
-      .eq("is_active", true);
+      .eq("is_active", true)
+      .order("name");
 
-    if (data) setDoctors(data);
-  }
-
-  /* ========================= */
-  /* Generate Daily Token */
-  /* ========================= */
-  async function generateToken() {
-    const today = new Date().toISOString().split("T")[0];
-
-    const { data } = await supabase
-      .from("opd_appointments")
-      .select("token_number")
-      .eq("visit_date", today);
-
-    if (data && data.length > 0) {
-      const maxToken = Math.max(
-        ...(data as TokenRow[]).map((d) => d.token_number || 0)
-      );
-      setToken(maxToken + 1);
-    } else {
-      setToken(1);
-    }
-  }
-
-  /* ========================= */
-  /* Load Patients & Doctors */
-  /* ========================= */
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void fetchPatients();
-    void fetchDoctors();
-    void generateToken();
-  }, []);
-
-  /* ========================= */
-  /* Handle Change */
-  /* ========================= */
-  const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-
-    if (name === "patient_name") {
-      const selectedPatient = patients.find(
-        (p) => p.name === value
-      );
-
-      setForm({
-        ...form,
-        patient_name: selectedPatient?.name || "",
-        age: String(selectedPatient?.age ?? ""),
-        gender: selectedPatient?.gender || "",
-        phone: selectedPatient?.phone || ""
-      });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
+    setDoctors(data || []);
   };
 
-  /* ========================= */
-  /* Submit */
-  /* ========================= */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!form.patient_name || !form.doctor_name) {
-      alert("Please select patient and doctor");
+  const createAppointment = async () => {
+    if (!selectedPatientId) {
+      alert("Select patient");
       return;
     }
 
-    setLoading(true);
+    if (!selectedDoctorId) {
+      alert("Select doctor");
+      return;
+    }
 
-    const today = new Date().toISOString().split("T")[0];
+    setSaving(true);
+
+    // Auto token
+    const { data: lastToken } = await supabase
+      .from("opd_appointments")
+      .select("token_number")
+      .order("token_number", { ascending: false })
+      .limit(1)
+      .single();
+
+    const nextToken = lastToken?.token_number
+      ? lastToken.token_number + 1
+      : 1;
+
+    const patient = patients.find(p => p.id === selectedPatientId);
+    const doctor = doctors.find(d => d.id === selectedDoctorId);
 
     const { error } = await supabase
       .from("opd_appointments")
-      .insert([
-        {
-          patient_name: form.patient_name,
-          age: form.age ? Number(form.age) : null,
-          gender: form.gender,
-          phone: form.phone,
-          doctor_name: form.doctor_name,
-          visit_type: form.visit_type,
-          token_number: token,
-          visit_date: today,
-          status: "Waiting"
-        }
-      ]);
+      .insert({
+        patient_id: selectedPatientId,
+        doctor_id: selectedDoctorId,
+        token_number: nextToken,
+        patient_name: patient.name,
+        age: patient.age,
+        phone: patient.phone,
+        doctor_name: doctor.name,
+        status: "Waiting"
+      });
 
     if (error) {
       alert(error.message);
-      setLoading(false);
+      setSaving(false);
       return;
     }
 
-    setForm({
-      patient_name: "",
-      age: "",
-      gender: "",
-      phone: "",
-      doctor_name: "",
-      visit_type: "New"
-    });
-
-    setLoading(false);
-    generateToken();
+    setSelectedPatientId("");
+    setSelectedDoctorId("");
+    setSaving(false);
     onSuccess();
   };
 
   return (
-    <div style={cardStyle}>
-      <h3 style={titleStyle}>New OPD Appointment</h3>
+    <div style={card}>
+      <h3 style={{ marginBottom: 20 }}>Create New Appointment</h3>
 
-      <div style={{ marginBottom: 15, fontWeight: 600 }}>
-        Token Number: {token}
+      <div style={grid}>
+        {/* Patient */}
+        <div style={field}>
+          <label style={label}>Patient</label>
+          <select
+            value={selectedPatientId}
+            onChange={(e) => setSelectedPatientId(e.target.value)}
+            style={input}
+          >
+            <option value="">Select Patient</option>
+            {patients.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} - {p.phone}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Doctor */}
+        <div style={field}>
+          <label style={label}>Doctor</label>
+          <select
+            value={selectedDoctorId}
+            onChange={(e) => setSelectedDoctorId(e.target.value)}
+            style={input}
+          >
+            <option value="">Select Doctor</option>
+            {doctors.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name} ({d.department})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} style={formStyle}>
-
-        {/* Select Patient */}
-        <select
-          name="patient_name"
-          value={form.patient_name}
-          onChange={handleChange}
-          required
-          style={inputStyle}
+      <div style={{ marginTop: 20 }}>
+        <button
+          onClick={createAppointment}
+          disabled={saving}
+          style={saveBtn}
         >
-          <option value="">Select Patient</option>
-          {patients.map((p) => (
-            <option key={p.id} value={p.name}>
-              {p.name} ({p.phone || "No Phone"})
-            </option>
-          ))}
-        </select>
-
-        {/* Select Doctor */}
-        <select
-          name="doctor_name"
-          value={form.doctor_name}
-          onChange={handleChange}
-          required
-          style={inputStyle}
-        >
-          <option value="">Select Doctor</option>
-          {doctors.map((d) => (
-            <option key={d.id} value={d.name}>
-              {d.name}
-            </option>
-          ))}
-        </select>
-
-        <button type="submit" style={buttonStyle} disabled={loading}>
-          {loading ? "Saving..." : "Send to OPD"}
+          {saving ? "Creating..." : "Create Appointment"}
         </button>
-      </form>
+      </div>
     </div>
   );
 }
 
-/* ========================= */
 /* Styles */
-/* ========================= */
 
-const cardStyle = {
-  background: "white",
-  padding: 28,
-  borderRadius: 16,
-  boxShadow: "0 8px 20px rgba(14,165,233,0.08)",
-  border: "1px solid #e0f2fe",
-  marginTop: 30
+const card = {
+  background: "#ffffff",
+  padding: 25,
+  borderRadius: 12,
+  boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
 };
 
-const titleStyle = {
-  marginBottom: 20,
-  color: "#0c4a6e",
-  fontWeight: 600
-};
-
-const formStyle = {
+const grid = {
   display: "grid",
-  gap: 14
+  gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+  gap: 20
 };
 
-const inputStyle = {
-  padding: "10px 12px",
-  borderRadius: 8,
+const field = {
+  display: "flex",
+  flexDirection: "column" as const
+};
+
+const label = {
+  marginBottom: 6,
+  fontSize: 14,
+  color: "#475569",
+  fontWeight: 500
+};
+
+const input = {
+  padding: 10,
+  borderRadius: 6,
   border: "1px solid #cbd5e1",
   fontSize: 14
 };
 
-const buttonStyle = {
-  marginTop: 10,
-  padding: "10px 14px",
-  background: "#0ea5e9",
+const saveBtn = {
+  padding: "10px 20px",
+  background: "#0f766e",
   color: "white",
   border: "none",
-  borderRadius: 8,
-  fontWeight: 600,
-  cursor: "pointer"
+  borderRadius: 6,
+  cursor: "pointer",
+  fontWeight: 600
 };
