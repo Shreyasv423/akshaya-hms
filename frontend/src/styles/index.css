@@ -32,3 +32,8 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+  }
+}

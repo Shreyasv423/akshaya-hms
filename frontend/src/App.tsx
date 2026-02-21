@@ -17,6 +17,7 @@ import Login from "./auth/Login";
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<string>("reception");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -45,7 +46,6 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // If not logged in → show login only
   if (!session) {
     return (
       <BrowserRouter>
@@ -58,27 +58,18 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Navbar />
+      <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
-      <div
-        style={{
-          display: "flex",
-          height: "calc(100vh - 85px)", // match navbar height
-          background: "#f8fafc"
-        }}
-      >
-        <Sidebar role={role} />
+      <div style={layoutWrapper}>
+        <Sidebar
+          role={role}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-        <div
-          style={{
-            flex: 1,
-            padding: 30,
-            overflowY: "auto"
-          }}
-        >
+        <main className="main-content" style={contentStyle}>
           <Routes>
 
-            {/* Default Redirect Based on Role */}
             <Route
               path="/"
               element={
@@ -90,17 +81,15 @@ export default function App() {
               }
             />
 
-            {/* Admin Routes */}
             {role === "admin" && (
               <>
                 <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/settings" element={<BillingSettings />} />
+                <Route path="/billing-settings" element={<BillingSettings />} />
                 <Route path="/ipd" element={<IpdDashboard />} />
                 <Route path="/discharge" element={<DischargeDashboard />} />
               </>
             )}
 
-            {/* Reception + Admin */}
             {(role === "admin" || role === "reception") && (
               <>
                 <Route path="/patients" element={<PatientList />} />
@@ -108,17 +97,30 @@ export default function App() {
               </>
             )}
 
-            {/* Doctor Only */}
             {role === "doctor" && (
               <Route path="/opd" element={<OpdDashboard />} />
             )}
 
-            {/* Catch All */}
             <Route path="*" element={<Navigate to="/" />} />
 
           </Routes>
-        </div>
+        </main>
       </div>
     </BrowserRouter>
   );
 }
+
+/* Layout Styles */
+
+const layoutWrapper = {
+  display: "flex",
+  minHeight: "calc(100vh - 80px)",
+  background: "#f8fafc"
+};
+
+const contentStyle = {
+  flex: 1,
+  padding: 20,
+  marginLeft: 260,
+  transition: "margin 0.3s ease"
+};

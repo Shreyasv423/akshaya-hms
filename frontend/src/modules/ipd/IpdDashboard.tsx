@@ -34,19 +34,26 @@ export default function IpdDashboard() {
 
   return (
     <div>
-      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20 }}>
+      <h2 style={headingStyle}>
         IPD Management
       </h2>
 
-      <div style={{ display: "flex", gap: 30 }}>
-        <div style={{ flex: 1 }}>
-          <AdmissionForm onSuccess={fetchAdmissions} />
-        </div>
-
-        <div style={{ flex: 2 }}>
-          <AdmissionList admissions={admissions} refresh={fetchAdmissions} />
-        </div>
+      {/* Admission Form */}
+      <div style={{ marginBottom: 40 }}>
+        <AdmissionForm onSuccess={fetchAdmissions} />
       </div>
+
+      {/* Admission List */}
+      <AdmissionList
+        admissions={admissions}
+        refresh={fetchAdmissions}
+      />
     </div>
   );
 }
+
+const headingStyle = {
+  fontSize: 22,
+  fontWeight: 700,
+  marginBottom: 20
+};

@@ -3,14 +3,18 @@ import {
   Users,
   Stethoscope,
   BedDouble,
-  FileText
+  FileText,
+  LayoutDashboard,
+  Settings
 } from "lucide-react";
 
 type Props = {
   role: string;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
-export default function Sidebar({ role }: Props) {
+export default function Sidebar({ role, isOpen, onClose }: Props) {
   const linkStyle = (isActive: boolean) => ({
     display: "flex",
     alignItems: "center",
@@ -21,95 +25,100 @@ export default function Sidebar({ role }: Props) {
     fontSize: 14,
     marginBottom: 10,
     textDecoration: "none",
-    transition: "all 0.2s ease",
     background: isActive ? "#ecfdf5" : "transparent",
     color: isActive ? "#047857" : "#334155",
     borderLeft: isActive ? "4px solid #10b981" : "4px solid transparent",
     cursor: "pointer"
   });
 
-  const containerStyle = {
-    width: 260,
-    minHeight: "100vh",
-    background: "#ffffff",
-    padding: 24,
-    borderRight: "1px solid #e2e8f0",
-    display: "flex",
-    flexDirection: "column" as const
-  };
-
-  const roleBadge = {
-    fontSize: 12,
-    fontWeight: 600,
-    marginBottom: 30,
-    padding: "6px 12px",
-    borderRadius: 20,
-    background: "#f1f5f9",
-    color: "#475569",
-    width: "fit-content"
-  };
-
   return (
-    <div style={containerStyle}>
-      {/* Role */}
-      <div style={roleBadge}>
-        🔐 {role?.toUpperCase()}
-      </div>
-
-      {(role === "admin" || role === "reception") && (
-        <>
-          <NavLink to="/patients" style={{ textDecoration: "none" }}>
-            {({ isActive }) => (
-              <div style={linkStyle(isActive)}>
-                <Users size={18} />
-                Patients
-              </div>
-            )}
-          </NavLink>
-
-          <NavLink to="/opd" style={{ textDecoration: "none" }}>
-            {({ isActive }) => (
-              <div style={linkStyle(isActive)}>
-                <Stethoscope size={18} />
-                OPD
-              </div>
-            )}
-          </NavLink>
-        </>
+    <>
+      {isOpen && (
+        <div onClick={onClose} style={overlay} />
       )}
 
-      {role === "doctor" && (
-        <NavLink to="/opd" style={{ textDecoration: "none" }}>
-          {({ isActive }) => (
-            <div style={linkStyle(isActive)}>
+      <div
+        style={{
+          ...containerStyle,
+          transform: isOpen ? "translateX(0)" : "translateX(-100%)"
+        }}
+      >
+        <div style={roleBadge}>
+          🔐 {role?.toUpperCase()}
+        </div>
+
+        {role === "admin" && (
+          <NavLink to="/admin" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
+            <LayoutDashboard size={18} />
+            Admin Dashboard
+          </NavLink>
+        )}
+
+        {(role === "admin" || role === "reception") && (
+          <>
+            <NavLink to="/patients" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
+              <Users size={18} />
+              Patients
+            </NavLink>
+
+            <NavLink to="/opd" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
               <Stethoscope size={18} />
               OPD
-            </div>
-          )}
-        </NavLink>
-      )}
+            </NavLink>
+          </>
+        )}
 
-      {role === "admin" && (
-        <>
-          <NavLink to="/ipd" style={{ textDecoration: "none" }}>
-            {({ isActive }) => (
-              <div style={linkStyle(isActive)}>
-                <BedDouble size={18} />
-                IPD
-              </div>
-            )}
-          </NavLink>
-          
-          <NavLink to="/discharge" style={{ textDecoration: "none" }}>
-            {({ isActive }) => (
-              <div style={linkStyle(isActive)}>
-                <FileText size={18} />
-                Discharge
-              </div>
-            )}
-          </NavLink>
-        </>
-      )}
-    </div>
+        {role === "admin" && (
+          <>
+            <NavLink to="/ipd" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
+              <BedDouble size={18} />
+              IPD
+            </NavLink>
+
+            <NavLink to="/discharge" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
+              <FileText size={18} />
+              Discharge
+            </NavLink>
+
+            <NavLink to="/billing-settings" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
+              <Settings size={18} />
+              Billing Settings
+            </NavLink>
+          </>
+        )}
+      </div>
+    </>
   );
 }
+
+const containerStyle = {
+  position: "fixed" as const,
+  top: 80,
+  left: 0,
+  width: 260,
+  height: "calc(100vh - 80px)",
+  background: "#ffffff",
+  padding: 24,
+  borderRight: "1px solid #e2e8f0",
+  transition: "transform 0.3s ease",
+  zIndex: 1000,
+  overflowY: "auto" as const
+};
+
+const overlay = {
+  position: "fixed" as const,
+  inset: 0,
+  background: "rgba(0,0,0,0.3)",
+  zIndex: 999
+};
+
+const roleBadge = {
+  fontSize: 12,
+  fontWeight: 600,
+  marginBottom: 30,
+  padding: "6px 12px",
+  borderRadius: 20,
+  background: "#f1f5f9",
+  color: "#475569",
+  width: "fit-content"
+};
