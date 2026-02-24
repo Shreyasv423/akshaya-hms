@@ -5,9 +5,22 @@ type Props = {
   onSuccess: () => void;
 };
 
+type Patient = {
+  id: string;
+  name: string;
+  phone?: string;
+  age?: number;
+};
+
+type Doctor = {
+  id: string;
+  name: string;
+  department?: string;
+};
+
 export default function AppointmentForm({ onSuccess }: Props) {
-  const [patients, setPatients] = useState<any[]>([]);
-  const [doctors, setDoctors] = useState<any[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState("");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [saving, setSaving] = useState(false);
@@ -38,21 +51,30 @@ export default function AppointmentForm({ onSuccess }: Props) {
 
   const createAppointment = async () => {
     if (!selectedPatientId) {
-      alert("Select patient");
+      alert("Please select a patient");
+      return;
+    }
+    if (!selectedDoctorId) {
+      alert("Please select a doctor");
       return;
     }
 
-    if (!selectedDoctorId) {
-      alert("Select doctor");
+    const patient = patients.find(p => p.id === selectedPatientId);
+    const doctor = doctors.find(d => d.id === selectedDoctorId);
+
+    if (!patient || !doctor) {
+      alert("Selected patient or doctor not found. Please try again.");
       return;
     }
 
     setSaving(true);
 
-    // Auto token
+    // Auto token: get today's max token to reset tokens daily
+    const today = new Date().toISOString().split("T")[0];
     const { data: lastToken } = await supabase
       .from("opd_appointments")
       .select("token_number")
+      .eq("visit_date", today)
       .order("token_number", { ascending: false })
       .limit(1)
       .single();
@@ -61,9 +83,6 @@ export default function AppointmentForm({ onSuccess }: Props) {
       ? lastToken.token_number + 1
       : 1;
 
-    const patient = patients.find(p => p.id === selectedPatientId);
-    const doctor = doctors.find(d => d.id === selectedDoctorId);
-
     const { error } = await supabase
       .from("opd_appointments")
       .insert({
@@ -71,9 +90,10 @@ export default function AppointmentForm({ onSuccess }: Props) {
         doctor_id: selectedDoctorId,
         token_number: nextToken,
         patient_name: patient.name,
-        age: patient.age,
-        phone: patient.phone,
+        age: patient.age ?? null,
+        phone: patient.phone ?? null,
         doctor_name: doctor.name,
+        visit_date: today,
         status: "Waiting"
       });
 
@@ -91,7 +111,9 @@ export default function AppointmentForm({ onSuccess }: Props) {
 
   return (
     <div style={card}>
-      <h3 style={{ marginBottom: 20 }}>Create New Appointment</h3>
+      <h3 style={{ margin: "0 0 20px", fontSize: 17, fontWeight: 600, color: "#0c4a6e" }}>
+        Create New Appointment
+      </h3>
 
       <div style={grid}>
         {/* Patient */}
@@ -105,7 +127,7 @@ export default function AppointmentForm({ onSuccess }: Props) {
             <option value="">Select Patient</option>
             {patients.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name} - {p.phone}
+                {p.name}{p.phone ? ` — ${p.phone}` : ""}
               </option>
             ))}
           </select>
@@ -122,12 +144,18 @@ export default function AppointmentForm({ onSuccess }: Props) {
             <option value="">Select Doctor</option>
             {doctors.map((d) => (
               <option key={d.id} value={d.id}>
-                {d.name} ({d.department})
+                {d.name}{d.department ? ` (${d.department})` : ""}
               </option>
             ))}
           </select>
         </div>
       </div>
+
+      {doctors.length === 0 && (
+        <p style={{ color: "#f59e0b", fontSize: 13, marginTop: 10 }}>
+          ⚠ No active doctors found. Please add doctors in the admin settings.
+        </p>
+      )}
 
       <div style={{ marginTop: 20 }}>
         <button
@@ -135,7 +163,7 @@ export default function AppointmentForm({ onSuccess }: Props) {
           disabled={saving}
           style={saveBtn}
         >
-          {saving ? "Creating..." : "Create Appointment"}
+          {saving ? "Creating..." : "✓ Create Appointment"}
         </button>
       </div>
     </div>
@@ -144,44 +172,46 @@ export default function AppointmentForm({ onSuccess }: Props) {
 
 /* Styles */
 
-const card = {
+const card: React.CSSProperties = {
   background: "#ffffff",
   padding: 25,
-  borderRadius: 12,
-  boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
+  borderRadius: 14,
+  boxShadow: "0 4px 16px rgba(0,0,0,0.06)"
 };
 
-const grid = {
+const grid: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
   gap: 20
 };
 
-const field = {
+const field: React.CSSProperties = {
   display: "flex",
-  flexDirection: "column" as const
+  flexDirection: "column"
 };
 
-const label = {
+const label: React.CSSProperties = {
   marginBottom: 6,
-  fontSize: 14,
+  fontSize: 13,
   color: "#475569",
-  fontWeight: 500
+  fontWeight: 600
 };
 
-const input = {
-  padding: 10,
-  borderRadius: 6,
+const input: React.CSSProperties = {
+  padding: "10px 12px",
+  borderRadius: 8,
   border: "1px solid #cbd5e1",
-  fontSize: 14
+  fontSize: 14,
+  background: "#fff"
 };
 
-const saveBtn = {
-  padding: "10px 20px",
+const saveBtn: React.CSSProperties = {
+  padding: "10px 24px",
   background: "#0f766e",
   color: "white",
   border: "none",
-  borderRadius: 6,
+  borderRadius: 8,
   cursor: "pointer",
-  fontWeight: 600
+  fontWeight: 600,
+  fontSize: 14
 };

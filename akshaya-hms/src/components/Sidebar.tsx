@@ -1,124 +1,169 @@
 import { NavLink } from "react-router-dom";
 import {
-  Users,
   Stethoscope,
   BedDouble,
   FileText,
   LayoutDashboard,
-  Settings
+  Settings,
+  FlaskConical,
+  Pill,
+  Activity,
+  HeartPulse,
+  Monitor
 } from "lucide-react";
 
 type Props = {
   role: string;
   isOpen: boolean;
+  isMobile: boolean;
   onClose: () => void;
 };
 
-export default function Sidebar({ role, isOpen, onClose }: Props) {
+export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
   const linkStyle = (isActive: boolean) => ({
     display: "flex",
     alignItems: "center",
-    gap: 12,
-    padding: "12px 18px",
-    borderRadius: 12,
+    gap: 10,
+    padding: "11px 16px",
+    borderRadius: 10,
     fontWeight: 500,
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 4,
     textDecoration: "none",
     background: isActive ? "#ecfdf5" : "transparent",
     color: isActive ? "#047857" : "#334155",
-    borderLeft: isActive ? "4px solid #10b981" : "4px solid transparent",
-    cursor: "pointer"
+    borderLeft: isActive ? "3px solid #10b981" : "3px solid transparent",
+    cursor: "pointer",
+    transition: "background 0.15s, color 0.15s"
   });
+
+  const NavItem = ({
+    to,
+    icon,
+    label
+  }: {
+    to: string;
+    icon: React.ReactNode;
+    label: string;
+  }) => (
+    <NavLink
+      to={to}
+      style={({ isActive }) => linkStyle(isActive)}
+      onClick={onClose}
+    >
+      {icon}
+      {label}
+    </NavLink>
+  );
 
   return (
     <>
-      {isOpen && (
-        <div onClick={onClose} style={overlay} />
+      {/* Overlay — only on mobile when sidebar is open */}
+      {isMobile && isOpen && (
+        <div onClick={onClose} style={overlayStyle} />
       )}
 
-      <div
+      <aside
         style={{
           ...containerStyle,
+          // On desktop: always visible, static in flow. On mobile: fixed overlay
+          position: isMobile ? "fixed" : "fixed",
           transform: isOpen ? "translateX(0)" : "translateX(-100%)"
         }}
       >
-        <div style={roleBadge}>
-          🔐 {role?.toUpperCase()}
+        {/* Role Badge */}
+        <div style={roleBadgeStyle}>
+          <span style={{ fontSize: 16 }}>🏥</span>
+          <span>{role?.toUpperCase()}</span>
         </div>
 
-        {role === "admin" && (
-          <NavLink to="/admin" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
-            <LayoutDashboard size={18} />
-            Admin Dashboard
-          </NavLink>
-        )}
+        <nav>
+          {/* Admin Section */}
+          {role === "admin" && (
+            <>
+              <div style={sectionLabel}>Overview</div>
+              <NavItem to="/admin" icon={<LayoutDashboard size={17} />} label="Dashboard" />
+            </>
+          )}
 
-        {(role === "admin" || role === "reception") && (
-          <>
-            <NavLink to="/patients" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
-              <Users size={18} />
-              Patients
-            </NavLink>
+          {/* Patients & OPD — admin + reception */}
+          {(role === "admin" || role === "reception") && (
+            <>
+              <div style={sectionLabel}>Front Desk</div>
+              <NavItem to="/front-desk" icon={<Monitor size={17} />} label="Front Desk" />
+            </>
+          )}
 
-            <NavLink to="/opd" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
-              <Stethoscope size={18} />
-              OPD
-            </NavLink>
-          </>
-        )}
+          {role === "doctor" && (
+            <>
+              <div style={sectionLabel}>Clinic</div>
+              <NavItem to="/opd" icon={<Stethoscope size={17} />} label="OPD" />
+            </>
+          )}
 
-        {role === "admin" && (
-          <>
-            <NavLink to="/ipd" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
-              <BedDouble size={18} />
-              IPD
-            </NavLink>
+          {/* Admin-only hospital modules */}
+          {role === "admin" && (
+            <>
+              <div style={sectionLabel}>Hospital</div>
+              <NavItem to="/ipd" icon={<BedDouble size={17} />} label="IPD" />
+              <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" />
+              <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" />
 
-            <NavLink to="/discharge" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
-              <FileText size={18} />
-              Discharge
-            </NavLink>
+              <div style={sectionLabel}>Services</div>
+              <NavItem to="/lab" icon={<FlaskConical size={17} />} label="Laboratory" />
+              <NavItem to="/pharmacy" icon={<Pill size={17} />} label="Pharmacy" />
 
-            <NavLink to="/billing-settings" style={({ isActive }) => linkStyle(isActive)} onClick={onClose}>
-              <Settings size={18} />
-              Billing Settings
-            </NavLink>
-          </>
-        )}
-      </div>
+              <div style={sectionLabel}>Management</div>
+              <NavItem to="/hr" icon={<Activity size={17} />} label="HR" />
+              <NavItem to="/billing-settings" icon={<Settings size={17} />} label="Settings" />
+            </>
+          )}
+        </nav>
+      </aside>
     </>
   );
 }
 
-const containerStyle = {
-  position: "fixed" as const,
+const containerStyle: React.CSSProperties = {
   top: 80,
   left: 0,
   width: 260,
   height: "calc(100vh - 80px)",
   background: "#ffffff",
-  padding: 24,
+  padding: "20px 16px",
   borderRight: "1px solid #e2e8f0",
   transition: "transform 0.3s ease",
   zIndex: 1000,
-  overflowY: "auto" as const
+  overflowY: "auto"
 };
 
-const overlay = {
-  position: "fixed" as const,
+const overlayStyle: React.CSSProperties = {
+  position: "fixed",
   inset: 0,
   background: "rgba(0,0,0,0.3)",
   zIndex: 999
 };
 
-const roleBadge = {
+const roleBadgeStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
   fontSize: 12,
-  fontWeight: 600,
-  marginBottom: 30,
-  padding: "6px 12px",
+  fontWeight: 700,
+  marginBottom: 24,
+  padding: "8px 14px",
   borderRadius: 20,
-  background: "#f1f5f9",
-  color: "#475569",
-  width: "fit-content"
+  background: "linear-gradient(135deg, #e0f2fe, #f0fdf4)",
+  color: "#0c4a6e",
+  letterSpacing: "0.04em"
+};
+
+const sectionLabel: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  color: "#94a3b8",
+  textTransform: "uppercase",
+  padding: "14px 16px 6px",
+  userSelect: "none"
 };

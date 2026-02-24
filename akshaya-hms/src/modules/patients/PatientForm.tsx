@@ -22,21 +22,6 @@ export default function PatientForm({
 
     setLoading(true);
 
-    /* Check duplicate phone */
-    if (phone) {
-      const { data: existing } = await supabase
-        .from("patients")
-        .select("id")
-        .eq("phone", phone)
-        .single();
-
-      if (existing) {
-        alert("Patient with this phone number already exists.");
-        setLoading(false);
-        return;
-      }
-    }
-
     const { error } = await supabase.from("patients").insert([
       {
         name: name.trim(),
