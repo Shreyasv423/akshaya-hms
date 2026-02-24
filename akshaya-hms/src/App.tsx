@@ -57,10 +57,15 @@ export default function App() {
         .select("role")
         .eq("id", s.user.id)
         .single()
-        .then(({ data }) => {
-          if (data?.role) setRole(data.role);
-        })
-        .finally(() => setInitialised(true)); // always unblock
+        .then(
+          ({ data }) => {
+            if (data?.role) setRole(data.role);
+            setInitialised(true);
+          },
+          () => {
+            setInitialised(true);
+          }
+        );
     });
 
     // Listen for future sign-in / sign-out events
@@ -76,9 +81,15 @@ export default function App() {
             .select("role")
             .eq("id", s.user.id)
             .single()
-            .then(({ data }) => {
-              if (data?.role) setRole(data.role);
-            });
+            .then(
+              ({ data }) => {
+                if (data?.role) setRole(data.role);
+                setInitialised(true);
+              },
+              () => {
+                setInitialised(true);
+              }
+            );
         }
       }
     );

@@ -3,6 +3,7 @@ import { supabase } from "../../services/supabase";
 
 type Props = {
   onSuccess: () => void;
+  initialPatientId?: string | null;
 };
 
 type Patient = {
@@ -18,10 +19,10 @@ type Doctor = {
   department?: string;
 };
 
-export default function AppointmentForm({ onSuccess }: Props) {
+export default function AppointmentForm({ onSuccess, initialPatientId }: Props) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [selectedPatientId, setSelectedPatientId] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState(initialPatientId || "");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [saving, setSaving] = useState(false);
 

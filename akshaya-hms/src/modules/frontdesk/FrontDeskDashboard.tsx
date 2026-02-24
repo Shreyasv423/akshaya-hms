@@ -4,6 +4,7 @@ import { supabase } from "../../services/supabase";
 
 import PatientForm from "../patients/PatientForm";
 import AppointmentForm from "../opd/AppointmentForm";
+import AppointmentList from "../opd/AppointmentList";
 
 type Patient = {
     id: string;
@@ -83,6 +84,25 @@ export default function FrontDeskDashboard() {
             </div>
 
             {/* Modern Tabs */}
+            <div style={statsGrid}>
+                <div style={{ ...statCard, borderTop: "3px solid #0ea5e9" }}>
+                    <div style={statLabel}>Total Patients</div>
+                    <div style={statValue}>{patients.length}</div>
+                </div>
+                <div style={{ ...statCard, borderTop: "3px solid #f59e0b" }}>
+                    <div style={statLabel}>Appointments Today</div>
+                    <div style={statValue}>{appointments.length}</div>
+                </div>
+                <div style={{ ...statCard, borderTop: "3px solid #8b5cf6" }}>
+                    <div style={statLabel}>Waiting / Consulting</div>
+                    <div style={statValue}>{appointments.filter(a => a.status !== "Completed").length}</div>
+                </div>
+                <div style={{ ...statCard, borderTop: "3px solid #10b981" }}>
+                    <div style={statLabel}>Completed Today</div>
+                    <div style={statValue}>{appointments.filter(a => a.status === "Completed").length}</div>
+                </div>
+            </div>
+
             <div style={tabContainer}>
                 <div style={tabBg}>
                     <button
@@ -186,45 +206,20 @@ export default function FrontDeskDashboard() {
                             {showOpdForm && (
                                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
                                     <div style={{ marginBottom: 20 }}>
-                                        {/* Pass prefilledPatientId to AppointmentForm if you modify it to accept it, otherwise user just selects it */}
                                         <AppointmentForm onSuccess={() => { setShowOpdForm(false); fetchAppointments(); }} initialPatientId={prefilledPatientId} />
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        <div style={tableCard}>
-                            {loadingOpd ? (
-                                <div style={emptyState}>Loading appointments...</div>
-                            ) : appointments.length === 0 ? (
-                                <div style={emptyState}>No OPD appointments today.</div>
-                            ) : (
-                                <div style={{ overflowX: "auto" }}>
-                                    <table style={table}>
-                                        <thead>
-                                            <tr style={thead}>
-                                                <th style={th}>Token</th>
-                                                <th style={th}>Patient</th>
-                                                <th style={th}>Doctor</th>
-                                                <th style={th}>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {appointments.map(a => (
-                                                <tr key={a.id} style={tr}>
-                                                    <td style={{ ...td, fontWeight: 700, color: "#0ea5e9" }}>#{a.token_number}</td>
-                                                    <td style={{ ...td, fontWeight: 500 }}>{a.patient_name}</td>
-                                                    <td style={{ ...td, color: "#64748b" }}>{a.doctor_name}</td>
-                                                    <td style={td}>
-                                                        <span style={statusBadge(a.status)}>{a.status}</span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
+                        {loadingOpd ? (
+                            <div style={emptyState}>Loading appointments...</div>
+                        ) : (
+                            <AppointmentList
+                                appointments={appointments as any}
+                                refresh={fetchAppointments}
+                            />
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -237,6 +232,32 @@ const container: React.CSSProperties = { paddingBottom: 40 };
 const headerRow: React.CSSProperties = { marginBottom: 24 };
 const title: React.CSSProperties = { fontSize: 24, fontWeight: 700, color: "#0f172a", margin: "0 0 4px 0" };
 const subtitle: React.CSSProperties = { fontSize: 14, color: "#64748b", margin: 0 };
+
+const statsGrid: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: 16,
+    marginBottom: 30
+};
+const statCard: React.CSSProperties = {
+    background: "white",
+    padding: "18px 24px",
+    borderRadius: 14,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.03)"
+};
+const statLabel: React.CSSProperties = {
+    fontSize: 12,
+    color: "#64748b",
+    fontWeight: 600,
+    textTransform: "uppercase",
+    letterSpacing: "0.02em",
+    marginBottom: 6
+};
+const statValue: React.CSSProperties = {
+    fontSize: 28,
+    fontWeight: 700,
+    color: "#0f172a"
+};
 
 const tabContainer: React.CSSProperties = { marginBottom: 24, display: "flex" };
 const tabBg: React.CSSProperties = {
@@ -304,14 +325,5 @@ const thead: React.CSSProperties = { background: "#fafafa", borderBottom: "1px s
 const th: React.CSSProperties = { padding: "14px 20px", textAlign: "left", fontSize: 13, fontWeight: 600, color: "#475569" };
 const tr: React.CSSProperties = { borderBottom: "1px solid #f8fafc", transition: "background 0.2s" };
 const td: React.CSSProperties = { padding: "14px 20px", fontSize: 14, color: "#334155" };
-
-const statusBadge = (status: string): React.CSSProperties => ({
-    padding: "4px 12px",
-    borderRadius: 20,
-    fontSize: 12,
-    fontWeight: 600,
-    background: status === "Waiting" ? "#fef3c7" : status === "In Consultation" ? "#e0f2fe" : "#dcfce7",
-    color: status === "Waiting" ? "#b45309" : status === "In Consultation" ? "#0369a1" : "#166534"
-});
 
 const emptyState: React.CSSProperties = { textAlign: "center", padding: 60, color: "#94a3b8", fontSize: 15 };
