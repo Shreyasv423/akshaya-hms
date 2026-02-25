@@ -72,14 +72,36 @@ export default function IpdDashboard() {
       {loading ? (
         <div style={{ color: "#64748b", fontSize: 14 }}>Loading admissions...</div>
       ) : (
-        <AdmissionList
-          admissions={admissions}
-          refresh={fetchAdmissions}
-        />
+        <div style={{ display: "grid", gap: 32 }}>
+          <section>
+            <h3 style={sectionTitle}>Active Admissions ({admittedCount})</h3>
+            <AdmissionList
+              admissions={admissions.filter(a => a.status === "Admitted")}
+              refresh={fetchAdmissions}
+            />
+          </section>
+
+          {dischargedCount > 0 && (
+            <section>
+              <h3 style={{ ...sectionTitle, color: "#64748b", marginTop: 24 }}>Recent Discharges</h3>
+              <AdmissionList
+                admissions={admissions.filter(a => a.status === "Discharged").slice(0, 5)}
+                refresh={fetchAdmissions}
+              />
+            </section>
+          )}
+        </div>
       )}
     </div>
   );
 }
+
+const sectionTitle: React.CSSProperties = {
+  fontSize: 16,
+  fontWeight: 600,
+  color: "#0c4a6e",
+  marginBottom: 16
+};
 
 const pageHeader: React.CSSProperties = {
   marginBottom: 24

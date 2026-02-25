@@ -11,8 +11,8 @@ export default function AdmissionList({ admissions, refresh }: Props) {
   const [selectedAdmission, setSelectedAdmission] = useState<string | null>(null);
 
   return (
-    <div style={{ marginTop: 30 }}>
-      <h3 style={{ fontWeight: 600 }}>Current Admissions ({admissions.length})</h3>
+    <div style={{ marginTop: 10 }}>
+
 
       <div style={{ display: "grid", gap: 16 }}>
         {admissions.map(a => (

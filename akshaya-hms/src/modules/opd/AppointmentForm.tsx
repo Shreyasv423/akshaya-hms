@@ -78,7 +78,7 @@ export default function AppointmentForm({ onSuccess, initialPatientId }: Props) 
       .eq("visit_date", today)
       .order("token_number", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const nextToken = lastToken?.token_number
       ? lastToken.token_number + 1

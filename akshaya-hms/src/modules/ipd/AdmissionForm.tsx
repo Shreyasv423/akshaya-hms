@@ -75,6 +75,7 @@ export default function AdmissionForm({ onSuccess }: Props) {
       doctor_name: doctor?.name,
       age: patient?.age,
       gender: patient?.gender,
+      bed_id: bedId,
       bed_number: bed?.bed_number,
       diagnosis,
       status: "Admitted"
