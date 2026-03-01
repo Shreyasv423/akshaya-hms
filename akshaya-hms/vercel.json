@@ -1,5 +1,16 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/rest/v1/:path*",
+      "destination": "https://isjgcavuisocwqnxkrzz.supabase.co/rest/v1/:path*"
+    },
+    {
+      "source": "/auth/v1/:path*",
+      "destination": "https://isjgcavuisocwqnxkrzz.supabase.co/auth/v1/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
   ]
 }

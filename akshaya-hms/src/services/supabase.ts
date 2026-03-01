@@ -4,12 +4,15 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 const supabaseProxy = import.meta.env.VITE_SUPABASE_PROXY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("Supabase environment variables are missing!");
-}
+/* 
+ * 🇮🇳 INDIA FIX: Supabase is blocked in India.
+ * We use Vercel Rewrites (configured in vercel.json) to proxy reqs.
+ * This makes the browser call Vercel instead of the blocked .co domain.
+ */
+const isProd = import.meta.env.PROD;
+const finalUrl = isProd ? window.location.origin : (supabaseProxy || supabaseUrl);
 
-// If a proxy URL is provided (to bypass India's ban), use that instead of the blocked .co domain
 export const supabase = createClient(
-  supabaseProxy || supabaseUrl,
+  finalUrl,
   supabaseAnonKey
 );
