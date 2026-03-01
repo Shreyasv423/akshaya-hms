@@ -22,9 +22,13 @@ export default function GeneralSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
   useEffect(() => {
     fetchSettings();
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const fetchSettings = async () => {
@@ -34,7 +38,6 @@ export default function GeneralSettings() {
       setSettings({
         ...settings,
         ...data,
-        // Handle bed_charges if stored as JSON or use defaults
         bed_charges: data.bed_charges || settings.bed_charges
       });
     }
@@ -49,7 +52,7 @@ export default function GeneralSettings() {
         ...settings,
         updated_at: new Date().toISOString()
       })
-      .neq("id", ""); // Update any row (usually only one exists)
+      .neq("id", "");
 
     if (error) {
       alert("Error saving settings: " + error.message);
@@ -63,9 +66,9 @@ export default function GeneralSettings() {
   if (loading) return <div style={{ padding: 20 }}>Loading settings...</div>;
 
   return (
-    <div>
-      <div style={header}>
-        <div>
+    <div style={{ paddingBottom: 40 }}>
+      <div style={isMobile ? mobileHeader : header}>
+        <div style={{ marginBottom: isMobile ? 16 : 0 }}>
           <h2 style={title}>Hospital Settings</h2>
           <p style={subtitle}>Global configuration and contact details</p>
         </div>
@@ -80,12 +83,12 @@ export default function GeneralSettings() {
         </div>
       )}
 
-      <div style={grid}>
+      <div style={{ ...grid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr" }}>
         {/* Hospital Profile */}
         <div style={card}>
           <h3 style={cardTitle}><Building2 size={18} /> Hospital Profile</h3>
-          <div style={formGrid}>
-            <div style={field}>
+          <div style={{ ...formGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr" }}>
+            <div style={{ ...field, gridColumn: "span 1" }}>
               <label style={lbl}>Hospital Name</label>
               <input
                 style={inp}
@@ -93,7 +96,7 @@ export default function GeneralSettings() {
                 onChange={e => setSettings({ ...settings, hospital_name: e.target.value })}
               />
             </div>
-            <div style={field}>
+            <div style={{ ...field, gridColumn: "span 1" }}>
               <label style={lbl}>Contact Phone</label>
               <div style={iconInp}>
                 <Phone size={14} color="#64748b" />
@@ -104,7 +107,7 @@ export default function GeneralSettings() {
                 />
               </div>
             </div>
-            <div style={field}>
+            <div style={{ ...field, gridColumn: "span 1" }}>
               <label style={lbl}>Website URL</label>
               <div style={iconInp}>
                 <Globe size={14} color="#64748b" />
@@ -115,7 +118,7 @@ export default function GeneralSettings() {
                 />
               </div>
             </div>
-            <div style={{ ...field, gridColumn: "span 2" }}>
+            <div style={{ ...field, gridColumn: isMobile ? "span 1" : "span 2" }}>
               <label style={lbl}>Address</label>
               <div style={iconInp}>
                 <MapPin size={14} color="#64748b" />
@@ -132,7 +135,7 @@ export default function GeneralSettings() {
         {/* Billing & Finance */}
         <div style={card}>
           <h3 style={cardTitle}><IndianRupee size={18} /> Billing Defaults</h3>
-          <div style={formGrid}>
+          <div style={{ ...formGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr" }}>
             <div style={field}>
               <label style={lbl}>OPD Consultation Fee</label>
               <div style={iconInp}>
@@ -186,6 +189,7 @@ export default function GeneralSettings() {
 }
 
 const header: React.CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 };
+const mobileHeader: React.CSSProperties = { display: "flex", flexDirection: "column", marginBottom: 24 };
 const title: React.CSSProperties = { fontSize: 22, fontWeight: 700, color: "#0c4a6e", margin: 0 };
 const subtitle: React.CSSProperties = { fontSize: 14, color: "#64748b", margin: "4px 0 0 0" };
 
@@ -202,11 +206,11 @@ const successBanner: React.CSSProperties = {
   fontWeight: 500
 };
 
-const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 };
+const grid: React.CSSProperties = { display: "grid", gap: 24 };
 const card: React.CSSProperties = { background: "white", padding: 24, borderRadius: 16, boxShadow: "0 4px 12px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0" };
 const cardTitle: React.CSSProperties = { fontSize: 16, fontWeight: 700, color: "#0c4a6e", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 };
 
-const formGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 };
+const formGrid: React.CSSProperties = { display: "grid", gap: 16 };
 const field: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };
 const lbl: React.CSSProperties = { fontSize: 12, fontWeight: 600, color: "#64748b" };
 const inp: React.CSSProperties = { padding: "10px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 14, outline: "none" };
@@ -224,6 +228,7 @@ const smallInp: React.CSSProperties = { border: "none", outline: "none", width: 
 const saveBtn: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
+  justifyContent: "center",
   gap: 8,
   padding: "10px 20px",
   background: "#0ea5e9",
@@ -233,5 +238,6 @@ const saveBtn: React.CSSProperties = {
   fontWeight: 600,
   cursor: "pointer",
   fontSize: 14,
-  boxShadow: "0 4px 12px rgba(14, 165, 233, 0.2)"
+  boxShadow: "0 4px 12px rgba(14, 165, 233, 0.2)",
+  width: "fit-content"
 };
