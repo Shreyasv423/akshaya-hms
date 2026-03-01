@@ -12,7 +12,9 @@ export default function IpdBillingModal({ admission, onClose, onSuccess }: Props
     const [loading, setLoading] = useState(false);
     const [daysStayed, setDaysStayed] = useState(0);
     const [bedChargePerDay, setBedChargePerDay] = useState(0);
-    const [additionalCharges, setAdditionalCharges] = useState<{ name: string, amount: number }[]>([]);
+    const [additionalCharges, setAdditionalCharges] = useState<{ name: string, amount: number | "" }[]>([]);
+    const [discount, setDiscount] = useState<number | "">("");
+    const [discountType, setDiscountType] = useState<"flat" | "percent">("flat");
     const [paymentMode, setPaymentMode] = useState("Cash");
 
     useEffect(() => {
@@ -31,11 +33,15 @@ export default function IpdBillingModal({ admission, onClose, onSuccess }: Props
     }, [admission]);
 
     const bedTotal = daysStayed * bedChargePerDay;
-    const additionalTotal = additionalCharges.reduce((sum, c) => sum + c.amount, 0);
-    const grandTotal = bedTotal + additionalTotal;
+    const additionalTotal = additionalCharges.reduce((sum, c) => sum + (Number(c.amount) || 0), 0);
+    const subTotal = bedTotal + additionalTotal;
+
+    const discountVal = Number(discount) || 0;
+    const calculatedDiscount = discountType === "percent" ? (subTotal * discountVal) / 100 : discountVal;
+    const grandTotal = Math.max(subTotal - calculatedDiscount, 0);
 
     const addCharge = () => {
-        setAdditionalCharges([...additionalCharges, { name: "", amount: 0 }]);
+        setAdditionalCharges([...additionalCharges, { name: "", amount: "" as number | "" }]);
     };
 
     const updateCharge = (index: number, field: string, value: any) => {
@@ -52,6 +58,8 @@ export default function IpdBillingModal({ admission, onClose, onSuccess }: Props
         const { error: billError } = await supabase.from("opd_bills").insert({
             patient_id: admission.patient_id,
             total_amount: grandTotal,
+            consultation_fee: 0,
+            discount: calculatedDiscount,
             payment_mode: paymentMode,
             // We can add metadata in a json field if it exists, or just use comments
         });
@@ -114,14 +122,39 @@ export default function IpdBillingModal({ admission, onClose, onSuccess }: Props
                                 style={{ ...inp, width: 100 }}
                                 type="number"
                                 placeholder="Amount"
-                                value={c.amount}
-                                onChange={e => updateCharge(i, "amount", Number(e.target.value))}
+                                value={c.amount === 0 ? "" : c.amount}
+                                onChange={e => updateCharge(i, "amount", e.target.value === "" ? "" : Number(e.target.value))}
                             />
                         </div>
                     ))}
                     <button style={addBtn} onClick={addCharge}>+ Add Charge</button>
 
                     <div style={totalBox}>
+                        <div style={{ ...totalRow, fontSize: 14, color: "#475569", marginBottom: 8, fontWeight: 'normal' }}>
+                            <span>Subtotal</span>
+                            <span>₹{subTotal}</span>
+                        </div>
+                        <div style={{ ...totalRow, fontSize: 14, color: "#475569", marginBottom: 16, fontWeight: 'normal' }}>
+                            <span>Discount</span>
+                            <div style={{ display: "flex", gap: "6px" }}>
+                                <select
+                                    value={discountType}
+                                    onChange={(e) => setDiscountType(e.target.value as "flat" | "percent")}
+                                    style={{ ...inp, width: "auto", padding: "4px 8px" }}
+                                >
+                                    <option value="flat">₹</option>
+                                    <option value="percent">%</option>
+                                </select>
+                                <input
+                                    type="number"
+                                    value={discount === 0 ? "" : discount}
+                                    onChange={(e) => setDiscount(e.target.value === "" ? "" : Number(e.target.value))}
+                                    style={{ ...inp, width: 70, padding: "4px 8px" }}
+                                    placeholder="0"
+                                />
+                            </div>
+                        </div>
+
                         <div style={totalRow}>
                             <span>Total Payable</span>
                             <span style={totalVal}>₹{grandTotal}</span>

@@ -121,10 +121,11 @@ const btn = {
   cursor: "pointer"
 };
 
-const badge = (status: string) => ({
+const badge = (status: string): React.CSSProperties => ({
   padding: "4px 10px",
   borderRadius: 20,
   fontSize: 12,
+  alignSelf: "flex-start",
   background: status === "Admitted" ? "#dbeafe" : "#dcfce7",
   color: status === "Admitted" ? "#1d4ed8" : "#166534"
 });

@@ -134,6 +134,7 @@ export default function AppointmentList({ appointments, refresh }: Props) {
                 setShowBilling(false);
                 setSelectedAppointment(null);
               }}
+              onSuccess={refresh}
             />
           </div>
         </div>
@@ -247,13 +248,17 @@ const statusBadge = (status: string): React.CSSProperties => ({
       ? "#fef3c7"
       : status === "In Consultation"
         ? "#e0f2fe"
-        : "#dcfce7",
+        : status === "Completed"
+          ? "#dcfce7"
+          : "#f3e8ff", // Billed
   color:
     status === "Waiting"
       ? "#b45309"
       : status === "In Consultation"
         ? "#0369a1"
-        : "#166534"
+        : status === "Completed"
+          ? "#166534"
+          : "#6b21a8" // Billed
 });
 
 const emptyState: React.CSSProperties = {

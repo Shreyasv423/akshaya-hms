@@ -4,12 +4,14 @@ import { supabase } from "../../services/supabase";
 type Props = {
   patient: any;
   onClose: () => void;
+  onSuccess?: () => void;
 };
 
-export default function OpdBillingModal({ patient, onClose }: Props) {
+export default function OpdBillingModal({ patient, onClose, onSuccess }: Props) {
   const [consultationFee, setConsultationFee] = useState(0);
   const [services, setServices] = useState<any[]>([]);
-  const [discount, setDiscount] = useState(0);
+  const [discount, setDiscount] = useState<number | "">("");
+  const [discountType, setDiscountType] = useState<"flat" | "percent">("flat");
   const [paymentMode, setPaymentMode] = useState("Cash");
   const [saving, setSaving] = useState(false);
 
@@ -43,10 +45,12 @@ export default function OpdBillingModal({ patient, onClose }: Props) {
   };
 
   const subtotal =
-    consultationFee +
-    services.reduce((sum, s) => sum + s.quantity * s.price, 0);
+    (typeof consultationFee === 'number' ? consultationFee : Number(consultationFee || 0)) +
+    services.reduce((sum, s) => sum + (s.quantity || 0) * (s.price || 0), 0);
 
-  const total = Math.max(subtotal - discount, 0);
+  const discountVal = Number(discount) || 0;
+  const calculatedDiscount = discountType === "percent" ? (subtotal * discountVal) / 100 : discountVal;
+  const total = Math.max(subtotal - calculatedDiscount, 0);
 
   const saveBill = async () => {
     setSaving(true);
@@ -81,7 +85,16 @@ export default function OpdBillingModal({ patient, onClose }: Props) {
       await supabase.from("opd_bill_items").insert(items);
     }
 
+    // Update appointment status to Billed
+    if (patient.id) {
+      await supabase
+        .from("opd_appointments")
+        .update({ status: "Billed" })
+        .eq("id", patient.id);
+    }
+
     setSaving(false);
+    if (onSuccess) onSuccess();
     onClose();
   };
 
@@ -103,8 +116,8 @@ export default function OpdBillingModal({ patient, onClose }: Props) {
         <h4 style={sectionTitle}>Consultation</h4>
         <input
           type="number"
-          value={consultationFee}
-          onChange={(e) => setConsultationFee(Number(e.target.value))}
+          value={consultationFee === 0 ? "" : consultationFee}
+          onChange={(e) => setConsultationFee(e.target.value === "" ? 0 : Number(e.target.value))}
           style={input}
         />
 
@@ -140,24 +153,24 @@ export default function OpdBillingModal({ patient, onClose }: Props) {
                   <td>
                     <input
                       type="number"
-                      value={s.quantity}
+                      value={s.quantity === 0 ? "" : s.quantity}
                       style={input}
                       onChange={(e) =>
-                        updateService(i, "quantity", Number(e.target.value))
+                        updateService(i, "quantity", e.target.value === "" ? "" : Number(e.target.value))
                       }
                     />
                   </td>
                   <td>
                     <input
                       type="number"
-                      value={s.price}
+                      value={s.price === 0 ? "" : s.price}
                       style={input}
                       onChange={(e) =>
-                        updateService(i, "price", Number(e.target.value))
+                        updateService(i, "price", e.target.value === "" ? "" : Number(e.target.value))
                       }
                     />
                   </td>
-                  <td>₹{s.quantity * s.price}</td>
+                  <td>₹{(s.quantity || 0) * (s.price || 0)}</td>
                   <td>
                     <button onClick={() => removeService(i)} style={removeBtn}>
                       ✕
@@ -179,12 +192,23 @@ export default function OpdBillingModal({ patient, onClose }: Props) {
 
         <div style={summaryRow}>
           <span>Discount</span>
-          <input
-            type="number"
-            value={discount}
-            onChange={(e) => setDiscount(Number(e.target.value))}
-            style={{ ...input, width: 100 }}
-          />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <select
+              value={discountType}
+              onChange={(e) => setDiscountType(e.target.value as "flat" | "percent")}
+              style={{ ...input, width: "auto" }}
+            >
+              <option value="flat">₹</option>
+              <option value="percent">%</option>
+            </select>
+            <input
+              type="number"
+              value={discount === 0 ? "" : discount}
+              onChange={(e) => setDiscount(e.target.value === "" ? "" : Number(e.target.value))}
+              style={{ ...input, width: 90 }}
+              placeholder="0"
+            />
+          </div>
         </div>
 
         <div style={totalRow}>

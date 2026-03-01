@@ -37,7 +37,8 @@ export default function HrDashboard() {
 
     const [form, setForm] = useState({
         name: "", role: "Nurse", department: "Nursing",
-        phone: "", email: "", join_date: "", is_active: true
+        phone: "", email: "", join_date: "", is_active: true,
+        password: "", create_login: false
     });
 
     useEffect(() => {
@@ -53,13 +54,22 @@ export default function HrDashboard() {
 
     const openAddForm = () => {
         setEditStaff(null);
-        setForm({ name: "", role: "Nurse", department: "Nursing", phone: "", email: "", join_date: "", is_active: true });
+        setForm({
+            name: "", role: "Nurse", department: "Nursing",
+            phone: "", email: "", join_date: "", is_active: true,
+            password: "", create_login: false
+        });
         setShowForm(true);
     };
 
     const openEditForm = (s: Staff) => {
         setEditStaff(s);
-        setForm({ name: s.name, role: s.role, department: s.department, phone: s.phone || "", email: s.email || "", join_date: s.join_date || "", is_active: s.is_active });
+        setForm({
+            name: s.name, role: s.role, department: s.department,
+            phone: s.phone || "", email: s.email || "",
+            join_date: s.join_date || "", is_active: s.is_active,
+            password: "", create_login: false
+        });
         setShowForm(true);
     };
 
@@ -68,7 +78,15 @@ export default function HrDashboard() {
         if (!form.name.trim()) return;
         setSaving(true);
 
-        const payload = {
+        // Map UI roles to DB roles
+        const getAuthRole = (r: string) => {
+            const low = r.toLowerCase();
+            if (low.includes("admin")) return "admin";
+            if (low.includes("doctor")) return "doctor";
+            return "reception"; // Nurse, Receptionist, etc. all get reception view or fallback
+        };
+
+        const payload: any = {
             name: form.name.trim(),
             role: form.role,
             department: form.department,
@@ -78,11 +96,46 @@ export default function HrDashboard() {
             is_active: form.is_active,
         };
 
+        // Handle Account Creation
+        if (!editStaff && form.create_login) {
+            if (!form.email || !form.password) {
+                alert("Email and password are required to create a login account.");
+                setSaving(false);
+                return;
+            }
+            if (form.password.length < 6) {
+                alert("Password must be at least 6 characters.");
+                setSaving(false);
+                return;
+            }
+
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: form.email.trim(),
+                password: form.password,
+                options: {
+                    data: {
+                        role: getAuthRole(form.role),
+                        full_name: form.name.trim()
+                    }
+                }
+            });
+
+            if (authError) {
+                alert(`Auth Error: ${authError.message}\n\nIf you see "Database error", please run the SQL Trigger fix in your Supabase dashboard.`);
+                setSaving(false);
+                return;
+            }
+
+            if (authData.user) {
+                payload.id = authData.user.id;
+            }
+        }
+
         let error;
         if (editStaff) {
             ({ error } = await supabase.from("staff").update(payload).eq("id", editStaff.id));
         } else {
-            ({ error } = await supabase.from("staff").insert(payload));
+            ({ error } = await supabase.from("staff").insert([payload]));
         }
 
         setSaving(false);
@@ -90,6 +143,9 @@ export default function HrDashboard() {
             setShowForm(false);
             setEditStaff(null);
             fetchStaff();
+            if (form.create_login) {
+                alert("Staff member and login account created successfully! Note: You might need to sign in again if you were automatically signed out.");
+            }
         } else {
             alert(error.message);
         }
@@ -171,6 +227,35 @@ export default function HrDashboard() {
                         </div>
                         <div style={field}><label style={lbl}>Phone</label><input style={inp} placeholder="Phone number" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} /></div>
                         <div style={field}><label style={lbl}>Email</label><input style={inp} type="email" placeholder="Email address" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
+                        {!editStaff && (
+                            <div style={{ ...field, gridColumn: "span 2", background: "#f8fafc", padding: "12px", borderRadius: "10px", border: "1px dashed #cbd5e1", marginTop: "10px" }}>
+                                <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#0c4a6e" }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={form.create_login}
+                                        onChange={e => setForm({ ...form, create_login: e.target.checked })}
+                                        style={{ width: 16, height: 16 }}
+                                    />
+                                    Create Login Account (Supabase Auth)
+                                </label>
+                                {form.create_login && (
+                                    <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
+                                        <label style={lbl}>Password *</label>
+                                        <input
+                                            style={inp}
+                                            type="password"
+                                            placeholder="Min 6 characters"
+                                            value={form.password}
+                                            onChange={e => setForm({ ...form, password: e.target.value })}
+                                            required={form.create_login}
+                                        />
+                                        <p style={{ fontSize: 11, color: "#64748b", margin: 0 }}>
+                                            Creating an account will link this staff member to Supabase login.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         <div style={field}><label style={lbl}>Join Date</label><input style={inp} type="date" value={form.join_date} onChange={e => setForm({ ...form, join_date: e.target.value })} /></div>
                         <div style={{ ...field, justifyContent: "flex-end", paddingBottom: 4 }}>
                             <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 14 }}>
