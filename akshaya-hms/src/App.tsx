@@ -19,6 +19,8 @@ import HrDashboard from "./modules/hr/HrDashboard";
 import IcuDashboard from "./modules/icu/IcuDashboard";
 import LabDashboard from "./modules/lab/LabDashboard";
 import PharmacyDashboard from "./modules/pharmacy/PharmacyDashboard";
+import BedManagement from "./modules/ipd/BedManagement";
+import BillingDashboard from "./modules/billing/BillingDashboard";
 
 const SIDEBAR_WIDTH = 260;
 
@@ -158,6 +160,7 @@ export default function App() {
             {role === "admin" && (
               <>
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/billing" element={<BillingDashboard />} />
                 <Route path="/billing-settings" element={<BillingSettings />} />
                 <Route path="/ipd" element={<IpdDashboard />} />
                 <Route path="/discharge" element={<DischargeDashboard />} />
@@ -165,12 +168,14 @@ export default function App() {
                 <Route path="/icu" element={<IcuDashboard />} />
                 <Route path="/lab" element={<LabDashboard />} />
                 <Route path="/pharmacy" element={<PharmacyDashboard />} />
+                <Route path="/beds" element={<BedManagement />} />
               </>
             )}
 
             {(role === "admin" || role === "reception") && (
               <>
                 <Route path="/front-desk" element={<FrontDeskDashboard />} />
+                <Route path="/billing" element={<BillingDashboard />} />
               </>
             )}
 

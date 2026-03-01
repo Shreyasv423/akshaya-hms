@@ -9,7 +9,8 @@ import {
   Pill,
   Activity,
   HeartPulse,
-  Monitor
+  Monitor,
+  Receipt
 } from "lucide-react";
 
 type Props = {
@@ -91,6 +92,7 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
             <>
               <div style={sectionLabel}>Front Desk</div>
               <NavItem to="/front-desk" icon={<Monitor size={17} />} label="Front Desk" />
+              <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" />
             </>
           )}
 
@@ -106,6 +108,7 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
             <>
               <div style={sectionLabel}>Hospital</div>
               <NavItem to="/ipd" icon={<BedDouble size={17} />} label="IPD" />
+              <NavItem to="/beds" icon={<Monitor size={17} />} label="Bed Management" />
               <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" />
               <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" />
 
@@ -114,6 +117,7 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
               <NavItem to="/pharmacy" icon={<Pill size={17} />} label="Pharmacy" />
 
               <div style={sectionLabel}>Management</div>
+              <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" />
               <NavItem to="/hr" icon={<Activity size={17} />} label="HR" />
               <NavItem to="/billing-settings" icon={<Settings size={17} />} label="Settings" />
             </>

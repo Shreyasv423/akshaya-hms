@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Admission } from "./IpdDashboard";
 import DischargeForm from "../discharge/DischargeForm";
+import IpdBillingModal from "../billing/IpdBillingModal";
 
 type Props = {
   admissions: Admission[];
@@ -9,6 +10,7 @@ type Props = {
 
 export default function AdmissionList({ admissions, refresh }: Props) {
   const [selectedAdmission, setSelectedAdmission] = useState<string | null>(null);
+  const [showBilling, setShowBilling] = useState<Admission | null>(null);
 
   return (
     <div style={{ marginTop: 10 }}>
@@ -37,12 +39,20 @@ export default function AdmissionList({ admissions, refresh }: Props) {
             </div>
 
             {a.status === "Admitted" && (
-              <button
-                style={btn}
-                onClick={() => setSelectedAdmission(a.id)}
-              >
-                Generate Discharge
-              </button>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  style={btn}
+                  onClick={() => setSelectedAdmission(a.id)}
+                >
+                  Summary
+                </button>
+                <button
+                  style={{ ...btn, background: "#10b981" }}
+                  onClick={() => setShowBilling(a)}
+                >
+                  Bill & Discharge
+                </button>
+              </div>
             )}
           </div>
         ))}
@@ -52,6 +62,14 @@ export default function AdmissionList({ admissions, refresh }: Props) {
         <DischargeForm
           admissionId={selectedAdmission}
           onClose={() => setSelectedAdmission(null)}
+          onSuccess={refresh}
+        />
+      )}
+
+      {showBilling && (
+        <IpdBillingModal
+          admission={showBilling}
+          onClose={() => setShowBilling(null)}
           onSuccess={refresh}
         />
       )}

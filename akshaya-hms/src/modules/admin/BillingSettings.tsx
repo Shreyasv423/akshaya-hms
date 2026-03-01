@@ -1,210 +1,237 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
+import { Building2, IndianRupee, Percent, Phone, MapPin, Globe, Save, CheckCircle2 } from "lucide-react";
 
-export default function BillingSettings() {
-  const [fee, setFee] = useState<number>(0);
+export default function GeneralSettings() {
+  const [settings, setSettings] = useState({
+    hospital_name: "Akshaya Hospital",
+    address: "",
+    phone: "",
+    website: "",
+    consultation_fee: 0,
+    gst_percent: 0,
+    currency: "INR",
+    bed_charges: {
+      "General Ward": 800,
+      "Semi-Private": 1500,
+      "Private": 3000,
+      "ICU": 5000
+    }
+  });
+
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
-    fetchFee();
+    fetchSettings();
   }, []);
 
-  const fetchFee = async () => {
-    const { data } = await supabase
-      .from("hospital_settings")
-      .select("*")
-      .limit(1)
-      .single();
-
-    if (data) setFee(data.consultation_fee);
+  const fetchSettings = async () => {
+    setLoading(true);
+    const { data } = await supabase.from("hospital_settings").select("*").single();
+    if (data) {
+      setSettings({
+        ...settings,
+        ...data,
+        // Handle bed_charges if stored as JSON or use defaults
+        bed_charges: data.bed_charges || settings.bed_charges
+      });
+    }
+    setLoading(false);
   };
 
-  const updateFee = async () => {
+  const handleSave = async () => {
     setSaving(true);
-    setSuccess(false);
-    setError("");
-
-    const { error: err } = await supabase
+    const { error } = await supabase
       .from("hospital_settings")
       .update({
-        consultation_fee: fee,
+        ...settings,
         updated_at: new Date().toISOString()
       })
-      .neq("id", "");
+      .neq("id", ""); // Update any row (usually only one exists)
 
-    setSaving(false);
-
-    if (err) {
-      setError("Failed to update. Please try again.");
+    if (error) {
+      alert("Error saving settings: " + error.message);
     } else {
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
     }
+    setSaving(false);
   };
+
+  if (loading) return <div style={{ padding: 20 }}>Loading settings...</div>;
 
   return (
     <div>
-      <h2 style={heading}>Billing Settings</h2>
-      <p style={subText}>Configure hospital-wide billing parameters.</p>
-
-      <div style={card}>
-        <h3 style={cardTitle}>OPD Consultation Fee</h3>
-        <p style={desc}>
-          This fee is automatically applied to every OPD billing bill at the time of generation.
-        </p>
-
-        <div style={row}>
-          <div style={inputWrapper}>
-            <span style={currencySymbol}>₹</span>
-            <input
-              type="number"
-              min={0}
-              value={fee}
-              onChange={(e) => setFee(Number(e.target.value))}
-              style={inputStyle}
-              placeholder="Enter consultation fee"
-            />
-          </div>
-
-          <button onClick={updateFee} disabled={saving} style={saveBtn}>
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
+      <div style={header}>
+        <div>
+          <h2 style={title}>Hospital Settings</h2>
+          <p style={subtitle}>Global configuration and contact details</p>
         </div>
-
-        {success && (
-          <div style={successMsg}>
-            ✓ Consultation fee updated to ₹{fee} successfully.
-          </div>
-        )}
-
-        {error && (
-          <div style={errorMsg}>{error}</div>
-        )}
+        <button style={saveBtn} onClick={handleSave} disabled={saving}>
+          {saving ? "Saving..." : <><Save size={18} /> Save Settings</>}
+        </button>
       </div>
 
-      <div style={infoCard}>
-        <h4 style={{ ...cardTitle, marginBottom: 8 }}>How Billing Works</h4>
-        <ul style={list}>
-          <li>Consultation fee is auto-loaded when generating an OPD bill.</li>
-          <li>You can add or remove additional services per bill.</li>
-          <li>Discounts can be applied per bill at the time of generation.</li>
-          <li>Bills support Cash, UPI, and Card payment modes.</li>
-        </ul>
+      {showSuccess && (
+        <div style={successBanner}>
+          <CheckCircle2 size={18} /> Settings successfully updated!
+        </div>
+      )}
+
+      <div style={grid}>
+        {/* Hospital Profile */}
+        <div style={card}>
+          <h3 style={cardTitle}><Building2 size={18} /> Hospital Profile</h3>
+          <div style={formGrid}>
+            <div style={field}>
+              <label style={lbl}>Hospital Name</label>
+              <input
+                style={inp}
+                value={settings.hospital_name}
+                onChange={e => setSettings({ ...settings, hospital_name: e.target.value })}
+              />
+            </div>
+            <div style={field}>
+              <label style={lbl}>Contact Phone</label>
+              <div style={iconInp}>
+                <Phone size={14} color="#64748b" />
+                <input
+                  style={plainInp}
+                  value={settings.phone}
+                  onChange={e => setSettings({ ...settings, phone: e.target.value })}
+                />
+              </div>
+            </div>
+            <div style={field}>
+              <label style={lbl}>Website URL</label>
+              <div style={iconInp}>
+                <Globe size={14} color="#64748b" />
+                <input
+                  style={plainInp}
+                  value={settings.website}
+                  onChange={e => setSettings({ ...settings, website: e.target.value })}
+                />
+              </div>
+            </div>
+            <div style={{ ...field, gridColumn: "span 2" }}>
+              <label style={lbl}>Address</label>
+              <div style={iconInp}>
+                <MapPin size={14} color="#64748b" />
+                <input
+                  style={plainInp}
+                  value={settings.address}
+                  onChange={e => setSettings({ ...settings, address: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Billing & Finance */}
+        <div style={card}>
+          <h3 style={cardTitle}><IndianRupee size={18} /> Billing Defaults</h3>
+          <div style={formGrid}>
+            <div style={field}>
+              <label style={lbl}>OPD Consultation Fee</label>
+              <div style={iconInp}>
+                <IndianRupee size={14} color="#64748b" />
+                <input
+                  type="number"
+                  style={plainInp}
+                  value={settings.consultation_fee}
+                  onChange={e => setSettings({ ...settings, consultation_fee: Number(e.target.value) })}
+                />
+              </div>
+            </div>
+            <div style={field}>
+              <label style={lbl}>Tax / GST (%)</label>
+              <div style={iconInp}>
+                <Percent size={14} color="#64748b" />
+                <input
+                  type="number"
+                  style={plainInp}
+                  value={settings.gst_percent}
+                  onChange={e => setSettings({ ...settings, gst_percent: Number(e.target.value) })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <h4 style={{ ...sectionLabel, marginTop: 20 }}>Bed Charges (per day)</h4>
+          <div style={bedChargesGrid}>
+            {Object.entries(settings.bed_charges).map(([ward, charge]) => (
+              <div key={ward} style={bedChargeRow}>
+                <span style={wardName}>{ward}</span>
+                <div style={smallIconInp}>
+                  <span style={{ fontSize: 12, color: "#94a3b8" }}>₹</span>
+                  <input
+                    type="number"
+                    style={smallInp}
+                    value={charge}
+                    onChange={e => {
+                      const updated = { ...settings.bed_charges, [ward]: Number(e.target.value) };
+                      setSettings({ ...settings, bed_charges: updated });
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-const heading: React.CSSProperties = {
-  fontSize: 22,
-  fontWeight: 700,
-  color: "#0c4a6e",
-  marginBottom: 4
-};
+const header: React.CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 };
+const title: React.CSSProperties = { fontSize: 22, fontWeight: 700, color: "#0c4a6e", margin: 0 };
+const subtitle: React.CSSProperties = { fontSize: 14, color: "#64748b", margin: "4px 0 0 0" };
 
-const subText: React.CSSProperties = {
-  color: "#64748b",
-  fontSize: 14,
-  marginBottom: 28
-};
-
-const card: React.CSSProperties = {
-  background: "white",
-  padding: 28,
-  borderRadius: 16,
-  boxShadow: "0 6px 20px rgba(14,165,233,0.07)",
-  border: "1px solid #e0f2fe",
-  marginBottom: 24
-};
-
-const infoCard: React.CSSProperties = {
-  background: "#f0fdf4",
-  padding: 24,
-  borderRadius: 14,
-  border: "1px solid #bbf7d0"
-};
-
-const cardTitle: React.CSSProperties = {
-  fontSize: 16,
-  fontWeight: 600,
-  color: "#0c4a6e",
-  marginBottom: 8
-};
-
-const desc: React.CSSProperties = {
-  fontSize: 13,
-  color: "#64748b",
-  marginBottom: 20
-};
-
-const row: React.CSSProperties = {
-  display: "flex",
-  gap: 16,
-  alignItems: "center",
-  flexWrap: "wrap"
-};
-
-const inputWrapper: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  border: "1px solid #cbd5e1",
-  borderRadius: 8,
-  overflow: "hidden",
-  flex: "0 0 220px"
-};
-
-const currencySymbol: React.CSSProperties = {
-  padding: "10px 14px",
-  background: "#f1f5f9",
-  color: "#475569",
-  fontWeight: 600,
-  fontSize: 15,
-  borderRight: "1px solid #cbd5e1"
-};
-
-const inputStyle: React.CSSProperties = {
-  padding: "10px 14px",
-  border: "none",
-  fontSize: 15,
-  outline: "none",
-  width: "100%"
-};
-
-const saveBtn: React.CSSProperties = {
-  padding: "10px 24px",
-  background: "#0f766e",
-  color: "white",
-  border: "none",
-  borderRadius: 8,
-  fontWeight: 600,
-  cursor: "pointer",
-  fontSize: 14
-};
-
-const successMsg: React.CSSProperties = {
-  marginTop: 16,
-  padding: "10px 16px",
+const successBanner: React.CSSProperties = {
   background: "#dcfce7",
   color: "#166534",
-  borderRadius: 8,
+  padding: "12px 16px",
+  borderRadius: 10,
+  marginBottom: 20,
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
   fontSize: 14,
   fontWeight: 500
 };
 
-const errorMsg: React.CSSProperties = {
-  marginTop: 16,
-  padding: "10px 16px",
-  background: "#fee2e2",
-  color: "#991b1b",
-  borderRadius: 8,
-  fontSize: 14
-};
+const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 };
+const card: React.CSSProperties = { background: "white", padding: 24, borderRadius: 16, boxShadow: "0 4px 12px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0" };
+const cardTitle: React.CSSProperties = { fontSize: 16, fontWeight: 700, color: "#0c4a6e", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 };
 
-const list: React.CSSProperties = {
-  paddingLeft: 20,
-  color: "#166534",
+const formGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 };
+const field: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };
+const lbl: React.CSSProperties = { fontSize: 12, fontWeight: 600, color: "#64748b" };
+const inp: React.CSSProperties = { padding: "10px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 14, outline: "none" };
+
+const iconInp: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, padding: "0 12px", borderRadius: 8, border: "1px solid #cbd5e1" };
+const plainInp: React.CSSProperties = { border: "none", padding: "10px 0", outline: "none", fontSize: 14, width: "100%" };
+
+const sectionLabel: React.CSSProperties = { fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 12 };
+const bedChargesGrid: React.CSSProperties = { display: "grid", gap: 10 };
+const bedChargeRow: React.CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#f8fafc", borderRadius: 8 };
+const wardName: React.CSSProperties = { fontSize: 13, color: "#475569" };
+const smallIconInp: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4, background: "white", padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0" };
+const smallInp: React.CSSProperties = { border: "none", outline: "none", width: 60, fontSize: 13, textAlign: "right", fontWeight: 600 };
+
+const saveBtn: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "10px 20px",
+  background: "#0ea5e9",
+  color: "white",
+  border: "none",
+  borderRadius: 10,
+  fontWeight: 600,
+  cursor: "pointer",
   fontSize: 14,
-  lineHeight: 1.8
+  boxShadow: "0 4px 12px rgba(14, 165, 233, 0.2)"
 };
