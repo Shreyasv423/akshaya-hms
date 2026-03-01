@@ -46,14 +46,22 @@ export default function App() {
 
   /* ---------- Auth ---------- */
   useEffect(() => {
-    // Get initial session synchronously from local storage
+    // Force initialization after 5 seconds as a fallback for slow mobile networks
+    const fallback = setTimeout(() => {
+      if (!initialised) {
+        console.log("Initialization fallback triggered");
+        setInitialised(true);
+      }
+    }, 5000);
+
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       if (!s) {
         setInitialised(true);
+        clearTimeout(fallback);
         return;
       }
-      // Fetch role — if this fails for any reason, fall back gracefully
+      // Fetch role
       supabase
         .from("profiles")
         .select("role")
@@ -63,14 +71,15 @@ export default function App() {
           ({ data }) => {
             if (data?.role) setRole(data.role);
             setInitialised(true);
+            clearTimeout(fallback);
           },
           () => {
             setInitialised(true);
+            clearTimeout(fallback);
           }
         );
     });
 
-    // Listen for future sign-in / sign-out events
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, s) => {
         if (event === "SIGNED_OUT") {
@@ -96,8 +105,11 @@ export default function App() {
       }
     );
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(fallback);
+    };
+  }, [initialised]);
 
   /* ---------- Still initialising ---------- */
   if (!initialised) {

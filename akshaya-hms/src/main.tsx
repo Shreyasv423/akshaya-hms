@@ -9,6 +9,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   </React.StrictMode>
 );
 
+/*
 // Register Service Worker for PWA
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -18,4 +19,5 @@ if ("serviceWorker" in navigator) {
       .catch((err) => console.log("SW Reg Error: ", err));
   });
 }
+*/
 
