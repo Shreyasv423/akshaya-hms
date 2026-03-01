@@ -46,13 +46,10 @@ export default function App() {
 
   /* ---------- Auth ---------- */
   useEffect(() => {
-    // Force initialization after 5 seconds as a fallback for slow mobile networks
+    // Safety fallback for mobile
     const fallback = setTimeout(() => {
-      if (!initialised) {
-        console.log("Initialization fallback triggered");
-        setInitialised(true);
-      }
-    }, 5000);
+      setInitialised(true);
+    }, 6000);
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
@@ -61,61 +58,54 @@ export default function App() {
         clearTimeout(fallback);
         return;
       }
-      // Fetch role
       supabase
         .from("profiles")
         .select("role")
         .eq("id", s.user.id)
         .single()
-        .then(
-          ({ data }) => {
-            if (data?.role) setRole(data.role);
-            setInitialised(true);
-            clearTimeout(fallback);
-          },
-          () => {
-            setInitialised(true);
-            clearTimeout(fallback);
-          }
-        );
+        .then(({ data }) => {
+          if (data?.role) setRole(data.role);
+          setInitialised(true);
+          clearTimeout(fallback);
+        }, () => {
+          setInitialised(true);
+          clearTimeout(fallback);
+        });
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, s) => {
-        if (event === "SIGNED_OUT") {
-          setSession(null);
-          setRole("reception");
-        } else if (event === "SIGNED_IN" && s) {
-          setSession(s);
-          supabase
-            .from("profiles")
-            .select("role")
-            .eq("id", s.user.id)
-            .single()
-            .then(
-              ({ data }) => {
-                if (data?.role) setRole(data.role);
-                setInitialised(true);
-              },
-              () => {
-                setInitialised(true);
-              }
-            );
-        }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === "SIGNED_OUT") {
+        setSession(null);
+        setRole("reception");
+      } else if (event === "SIGNED_IN" && s) {
+        setSession(s);
+        supabase.from("profiles").select("role").eq("id", s.user.id).single().then(({ data }) => {
+          if (data?.role) setRole(data.role);
+          setInitialised(true);
+        }, () => setInitialised(true));
       }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();
       clearTimeout(fallback);
     };
-  }, [initialised]);
+  }, []);
 
   /* ---------- Still initialising ---------- */
   if (!initialised) {
     return (
       <div style={loadingScreen}>
         <div style={spinner} />
+        <div style={{ marginTop: 20, textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: "#64748b", margin: 0 }}>Starting Akshaya HMS...</p>
+          <button
+            onClick={() => setInitialised(true)}
+            style={{ marginTop: 12, background: "transparent", border: "none", color: "#0ea5e9", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}
+          >
+            Click here if screen hangs
+          </button>
+        </div>
       </div>
     );
   }
