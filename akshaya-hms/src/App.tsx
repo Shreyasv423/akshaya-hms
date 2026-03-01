@@ -97,13 +97,16 @@ export default function App() {
     return (
       <div style={loadingScreen}>
         <div style={spinner} />
-        <div style={{ marginTop: 20, textAlign: "center" }}>
-          <p style={{ fontSize: 13, color: "#64748b", margin: 0 }}>Starting Akshaya HMS...</p>
+        <div style={{ marginTop: 20, textAlign: "center", maxWidth: 280 }}>
+          <p style={{ fontSize: 13, color: "#64748b", margin: 0, lineHeight: 1.4 }}>
+            Connecting to Akshaya HMS... <br />
+            (If hang occurs in India, please use 1.1.1.1 WARP)
+          </p>
           <button
             onClick={() => setInitialised(true)}
-            style={{ marginTop: 12, background: "transparent", border: "none", color: "#0ea5e9", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}
+            style={{ marginTop: 16, background: "#0ea5e9", border: "none", color: "white", fontSize: 13, cursor: "pointer", padding: "8px 16px", borderRadius: 8, fontWeight: 600 }}
           >
-            Click here if screen hangs
+            Force Open App
           </button>
         </div>
       </div>
