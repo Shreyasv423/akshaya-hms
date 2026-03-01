@@ -20,8 +20,9 @@ export default function BillingDashboard() {
 
     const fetchBills = async () => {
         setLoading(true);
-        // Fetch OPD Bills
-        const { data: opdBills } = await supabase
+        // Fetch all bills from opd_bills table
+        // Join with patients to get the name for both OPD and IPD bills
+        const { data: billsData, error } = await supabase
             .from("opd_bills")
             .select(`
                 id,
@@ -29,27 +30,47 @@ export default function BillingDashboard() {
                 total_amount,
                 payment_mode,
                 created_at,
-                opd_appointments (patient_name)
+                patients (name)
             `)
             .order("created_at", { ascending: false });
 
-        // Transform OPD bills
-        const formattedOpd: Bill[] = (opdBills || []).map(b => ({
+        if (error) {
+            console.error("Error fetching bills:", error);
+            setLoading(false);
+            return;
+        }
+
+        // Transform bills
+        const formattedBills: Bill[] = (billsData || []).map(b => ({
             id: b.id,
             patient_id: b.patient_id,
-            patient_name: (b as any).opd_appointments?.patient_name || "Unknown Patient",
+            patient_name: (b as any).patients?.name || "Unknown Patient",
             total_amount: b.total_amount,
             payment_mode: b.payment_mode,
             created_at: b.created_at,
-            type: "OPD"
+            // For now, if there's no consultation fee or if it's 0 it might be IPD, 
+            // but let's just keep it simple or check if we can distinguish
+            type: (b as any).consultation_fee > 0 ? "OPD" : "IPD"
         }));
 
-        setBills(formattedOpd);
+        setBills(formattedBills);
         setLoading(false);
     };
 
     useEffect(() => {
         fetchBills();
+
+        // Subscribe to real-time changes
+        const channel = supabase
+            .channel('public:opd_bills')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'opd_bills' }, () => {
+                fetchBills();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const filteredBills = bills.filter(b => {

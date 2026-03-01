@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
+import IpdBillingModal from "../billing/IpdBillingModal";
 
 type IcuPatient = {
     id: string;
+    patient_id: string;
     patient_name: string;
     age: number | null;
     gender: string;
+    bed_id: string;
     bed_number: string;
     doctor_name: string;
     diagnosis: string;
@@ -21,14 +24,17 @@ type IcuPatient = {
 export default function IcuDashboard() {
     const [patients, setPatients] = useState<IcuPatient[]>([]);
     const [allPatients, setAllPatients] = useState<any[]>([]);
+    const [doctors, setDoctors] = useState<any[]>([]);
+    const [beds, setBeds] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState<IcuPatient | null>(null);
+    const [billingPatient, setBillingPatient] = useState<IcuPatient | null>(null);
     const [saving, setSaving] = useState(false);
 
     // Admission form
     const [form, setForm] = useState({
-        patient_id: "", doctor_name: "", bed_number: "",
+        patient_id: "", doctor_name: "", bed_id: "", bed_number: "",
         diagnosis: "", status: "Critical"
     });
 
@@ -38,8 +44,19 @@ export default function IcuDashboard() {
 
     useEffect(() => {
         fetchIcuPatients();
-        fetchPatients();
+        fetchDropdownData();
     }, []);
+
+    const fetchDropdownData = async () => {
+        const [{ data: p }, { data: d }, { data: b }] = await Promise.all([
+            supabase.from("patients").select("id, name, age, gender").order("name"),
+            supabase.from("doctors").select("id, name").eq("is_active", true).order("name"),
+            supabase.from("beds").select("id, bed_number, ward").eq("is_occupied", false)
+        ]);
+        setAllPatients(p || []);
+        setDoctors(d || []);
+        setBeds((b || []).filter(bed => bed.ward.toLowerCase().includes("icu")));
+    };
 
     const fetchIcuPatients = async () => {
         setLoading(true);
@@ -51,14 +68,9 @@ export default function IcuDashboard() {
         setLoading(false);
     };
 
-    const fetchPatients = async () => {
-        const { data } = await supabase.from("patients").select("id, name, age, gender").order("name");
-        setAllPatients(data || []);
-    };
-
     const handleAdmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.patient_id || !form.doctor_name || !form.bed_number || !form.diagnosis) return;
+        if (!form.patient_id || !form.doctor_name || !form.bed_id || !form.diagnosis) return;
         setSaving(true);
         const patient = allPatients.find(p => p.id === form.patient_id);
         const { error } = await supabase.from("icu_patients").insert({
@@ -67,19 +79,23 @@ export default function IcuDashboard() {
             age: patient?.age ?? null,
             gender: patient?.gender ?? "",
             doctor_name: form.doctor_name,
+            bed_id: form.bed_id,
             bed_number: form.bed_number,
             diagnosis: form.diagnosis,
             status: form.status,
             admission_date: new Date().toISOString().split("T")[0],
         });
-        setSaving(false);
+
         if (!error) {
-            setForm({ patient_id: "", doctor_name: "", bed_number: "", diagnosis: "", status: "Critical" });
+            await supabase.from("beds").update({ is_occupied: true }).eq("id", form.bed_id);
+            setForm({ patient_id: "", doctor_name: "", bed_id: "", bed_number: "", diagnosis: "", status: "Critical" });
             setShowForm(false);
             fetchIcuPatients();
+            fetchDropdownData();
         } else {
             alert(error.message);
         }
+        setSaving(false);
     };
 
     const updateVitals = async () => {
@@ -101,10 +117,16 @@ export default function IcuDashboard() {
         fetchIcuPatients();
     };
 
-    const discharge = async (id: string) => {
-        if (!confirm("Discharge this ICU patient?")) return;
-        await supabase.from("icu_patients").delete().eq("id", id);
-        fetchIcuPatients();
+    const discharge = async (patient: IcuPatient) => {
+        setBillingPatient({ ...patient, ward: "ICU" } as any);
+    };
+
+    const handleDischargeSuccess = async () => {
+        if (billingPatient) {
+            await supabase.from("icu_patients").delete().eq("id", billingPatient.id);
+            fetchIcuPatients();
+            setBillingPatient(null);
+        }
     };
 
     const critical = patients.filter(p => p.status === "Critical").length;
@@ -146,11 +168,20 @@ export default function IcuDashboard() {
                         </div>
                         <div style={fieldStyle}>
                             <label style={lbl}>ICU Bed Number</label>
-                            <input style={inp} placeholder="e.g., ICU-01" value={form.bed_number} onChange={e => setForm({ ...form, bed_number: e.target.value })} required />
+                            <select style={inp} value={form.bed_id} onChange={e => {
+                                const bed = beds.find(b => b.id === e.target.value);
+                                setForm({ ...form, bed_id: e.target.value, bed_number: bed?.bed_number || "" });
+                            }} required>
+                                <option value="">Select Bed</option>
+                                {beds.map(b => <option key={b.id} value={b.id}>Bed {b.bed_number} ({b.ward})</option>)}
+                            </select>
                         </div>
                         <div style={fieldStyle}>
                             <label style={lbl}>Doctor In-Charge</label>
-                            <input style={inp} placeholder="Dr. Name" value={form.doctor_name} onChange={e => setForm({ ...form, doctor_name: e.target.value })} required />
+                            <select style={inp} value={form.doctor_name} onChange={e => setForm({ ...form, doctor_name: e.target.value })} required>
+                                <option value="">Select Doctor</option>
+                                {doctors.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+                            </select>
                         </div>
                         <div style={fieldStyle}>
                             <label style={lbl}>Initial Status</label>
@@ -224,8 +255,8 @@ export default function IcuDashboard() {
                                     <option>Stable</option>
                                     <option>Improving</option>
                                 </select>
-                                <button style={smBtn("#dc2626")} onClick={() => discharge(p.id)}>
-                                    Discharge
+                                <button style={smBtn("#dc2626")} onClick={() => discharge(p)}>
+                                    Bill & Discharge
                                 </button>
                             </div>
                         </div>
@@ -267,6 +298,15 @@ export default function IcuDashboard() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Billing Modal */}
+            {billingPatient && (
+                <IpdBillingModal
+                    admission={billingPatient}
+                    onClose={() => setBillingPatient(null)}
+                    onSuccess={handleDischargeSuccess}
+                />
             )}
         </div>
     );
