@@ -33,13 +33,14 @@ export default function Navbar({ toggleSidebar }: Props) {
             <span style={akshayaStyle}>Akshaya </span>
             <span style={hospitalsStyle}>Hospitals</span>
           </div>
-          <div style={taglineStyle}>Together for Better Health</div>
+          <div className="tagline" style={taglineStyle}>Together for Better Health</div>
         </div>
       </div>
 
       <div style={rightSection}>
         <button style={logoutBtn} onClick={handleLogout}>
-          Logout
+          <span className="logout-btn-text">Logout</span>
+          <span style={{ display: "none" }} className="mobile-only">✕</span>
         </button>
       </div>
     </div>

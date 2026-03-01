@@ -26,7 +26,7 @@ export default function Login() {
       return;
     }
 
- navigate("/");
+    navigate("/");
 
   }
 
@@ -83,7 +83,8 @@ const pageStyle = {
 };
 
 const cardStyle = {
-  width: 360,
+  width: "90%",
+  maxWidth: 400,
   padding: 40,
   background: "white",
   borderRadius: 16,

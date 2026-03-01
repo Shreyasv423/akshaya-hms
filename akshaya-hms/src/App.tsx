@@ -138,7 +138,7 @@ export default function App() {
           className="main-content"
           style={{
             flex: 1,
-            padding: 24,
+            padding: isMobile ? 12 : 24,
             marginLeft: !isMobile && sidebarOpen ? SIDEBAR_WIDTH : 0,
             transition: "margin-left 0.3s ease",
             minWidth: 0,

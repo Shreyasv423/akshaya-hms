@@ -5,3 +5,23 @@
   min-height: 100vh;
   text-align: left;
 }
+
+@media (max-width: 480px) {
+  .tagline {
+    display: none;
+  }
+
+  .logout-btn-text {
+    display: none;
+  }
+
+  .mobile-only {
+    display: inline !important;
+  }
+}
+
+/* Ensure tables scroll horizontally on small screens */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
