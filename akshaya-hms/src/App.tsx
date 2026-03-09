@@ -13,6 +13,7 @@ import IpdDashboard from "./modules/ipd/IpdDashboard";
 import DischargeDashboard from "./modules/discharge/DischargeDashboard";
 import AdminDashboard from "./modules/admin/AdminDashboard";
 import BillingSettings from "./modules/admin/BillingSettings";
+import AuditLogs from "./modules/admin/AuditLogs";
 import Login from "./auth/Login";
 
 import HrDashboard from "./modules/hr/HrDashboard";
@@ -165,6 +166,7 @@ export default function App() {
             {role === "admin" && (
               <>
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/audit-logs" element={<AuditLogs />} />
                 <Route path="/billing" element={<BillingDashboard />} />
                 <Route path="/billing-settings" element={<BillingSettings />} />
                 <Route path="/ipd" element={<IpdDashboard />} />

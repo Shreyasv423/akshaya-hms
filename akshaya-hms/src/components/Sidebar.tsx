@@ -10,7 +10,8 @@ import {
   Activity,
   HeartPulse,
   Monitor,
-  Receipt
+  Receipt,
+  ShieldAlert
 } from "lucide-react";
 
 type Props = {
@@ -84,6 +85,7 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
             <>
               <div style={sectionLabel}>Overview</div>
               <NavItem to="/admin" icon={<LayoutDashboard size={17} />} label="Dashboard" />
+              <NavItem to="/audit-logs" icon={<ShieldAlert size={17} />} label="Audit Logs" />
             </>
           )}
 
