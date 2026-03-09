@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function AdminDashboard() {
   const [totalPatients, setTotalPatients] = useState(0);
@@ -11,6 +12,7 @@ export default function AdminDashboard() {
   const [recentBills, setRecentBills] = useState<any[]>([]);
   const [recentOpd, setRecentOpd] = useState<any[]>([]);
   const [totalBeds, setTotalBeds] = useState(0);
+  const [revenueData, setRevenueData] = useState<any[]>([]);
 
   async function fetchStats() {
     const today = new Date().toISOString().split("T")[0];
@@ -59,6 +61,17 @@ export default function AdminDashboard() {
 
     setRecentBills(billsData?.slice(0, 5) || []);
     setRecentOpd(opdData?.slice(0, 5) || []);
+
+    // Mock chart data - dynamically aggregate from DB in production
+    setRevenueData([
+      { name: "Mon", revenue: 4000 },
+      { name: "Tue", revenue: 3000 },
+      { name: "Wed", revenue: 5000 },
+      { name: "Thu", revenue: revenue > 0 ? revenue : 2000 },
+      { name: "Fri", revenue: 0 },
+      { name: "Sat", revenue: 0 },
+      { name: "Sun", revenue: 0 },
+    ]);
   }
 
   useEffect(() => {
@@ -86,18 +99,34 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Recent OPD */}
-      <Section title="Today's OPD Visits">
-        {recentOpd.length === 0 ? (
-          <p style={emptyText}>No OPD visits today.</p>
-        ) : (
-          recentOpd.map((visit) => (
-            <Row key={visit.id}>
-              {visit.patient_name} — {visit.doctor_name}
-            </Row>
-          ))
-        )}
-      </Section>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+        {/* Chart Section */}
+        <Section title="Revenue (Past 7 Days)">
+          <div style={{ width: "100%", height: 250 }}>
+            <ResponsiveContainer>
+              <BarChart data={revenueData}>
+                <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
+                <YAxis stroke="#64748b" fontSize={12} />
+                <Tooltip cursor={{ fill: "#f1f5f9" }} />
+                <Bar dataKey="revenue" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Section>
+
+        {/* Recent OPD */}
+        <Section title="Today's OPD Visits">
+          {recentOpd.length === 0 ? (
+            <p style={emptyText}>No OPD visits today.</p>
+          ) : (
+            recentOpd.map((visit) => (
+              <Row key={visit.id}>
+                {visit.patient_name} — {visit.doctor_name}
+              </Row>
+            ))
+          )}
+        </Section>
+      </div>
 
       {/* Recent Bills */}
       <Section title="Recent Bills">

@@ -11,7 +11,10 @@ import {
   HeartPulse,
   Monitor,
   Receipt,
-  ShieldAlert
+  ShieldAlert,
+  ClipboardList,
+  Scissors,
+  FilePlus
 } from "lucide-react";
 
 type Props = {
@@ -95,6 +98,7 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
               <div style={sectionLabel}>Front Desk</div>
               <NavItem to="/front-desk" icon={<Monitor size={17} />} label="Front Desk" />
               <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" />
+              <NavItem to="/insurance" icon={<FilePlus size={17} />} label="TPA Claims" />
             </>
           )}
 
@@ -105,21 +109,50 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
             </>
           )}
 
-          {/* Admin-only hospital modules */}
-          {role === "admin" && (
+          {/* EMR - Admin & Doctor */}
+          {(role === "admin" || role === "doctor") && (
+            <>
+              <div style={sectionLabel}>Records</div>
+              <NavItem to="/emr" icon={<ClipboardList size={17} />} label="EMR Timeline" />
+            </>
+          )}
+
+          {/* Hospital - Admin & Nurse */}
+          {(role === "admin" || role === "nurse") && (
             <>
               <div style={sectionLabel}>Hospital</div>
               <NavItem to="/ipd" icon={<BedDouble size={17} />} label="IPD" />
               <NavItem to="/beds" icon={<Monitor size={17} />} label="Bed Management" />
               <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" />
               <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" />
+            </>
+          )}
 
+          {/* OT - Admin, Doctor, Nurse */}
+          {(role === "admin" || role === "doctor" || role === "nurse") && (
+            <>
+              <div style={sectionLabel}>Surgery</div>
+              <NavItem to="/ot" icon={<Scissors size={17} />} label="Operation Theatre" />
+            </>
+          )}
+
+          {/* Services - Lab & Pharmacy */}
+          {(role === "admin" || role === "lab_technician" || role === "pharmacist") && (
+            <>
               <div style={sectionLabel}>Services</div>
-              <NavItem to="/lab" icon={<FlaskConical size={17} />} label="Laboratory" />
-              <NavItem to="/pharmacy" icon={<Pill size={17} />} label="Pharmacy" />
+              {(role === "admin" || role === "lab_technician") && (
+                <NavItem to="/lab" icon={<FlaskConical size={17} />} label="Laboratory" />
+              )}
+              {(role === "admin" || role === "pharmacist") && (
+                <NavItem to="/pharmacy" icon={<Pill size={17} />} label="Pharmacy" />
+              )}
+            </>
+          )}
 
+          {/* Management - Admin only */}
+          {role === "admin" && (
+            <>
               <div style={sectionLabel}>Management</div>
-              <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" />
               <NavItem to="/hr" icon={<Activity size={17} />} label="HR" />
               <NavItem to="/billing-settings" icon={<Settings size={17} />} label="Settings" />
             </>

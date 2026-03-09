@@ -23,6 +23,10 @@ import PharmacyDashboard from "./modules/pharmacy/PharmacyDashboard";
 import BedManagement from "./modules/ipd/BedManagement";
 import BillingDashboard from "./modules/billing/BillingDashboard";
 
+import EmrDashboard from "./modules/emr/EmrDashboard";
+import OtDashboard from "./modules/ot/OtDashboard";
+import InsuranceDashboard from "./modules/insurance/InsuranceDashboard";
+
 const SIDEBAR_WIDTH = 260;
 
 export default function App() {
@@ -159,23 +163,51 @@ export default function App() {
                   ? <Navigate to="/admin" replace />
                   : role === "doctor"
                     ? <Navigate to="/opd" replace />
-                    : <Navigate to="/front-desk" replace />
+                  : role === "nurse"
+                    ? <Navigate to="/ipd" replace />
+                  : role === "pharmacist"
+                    ? <Navigate to="/pharmacy" replace />
+                  : role === "lab_technician"
+                    ? <Navigate to="/lab" replace />
+                  : <Navigate to="/front-desk" replace />
               }
             />
+
+            {(role === "admin" || role === "nurse") && (
+              <>
+                <Route path="/ipd" element={<IpdDashboard />} />
+                <Route path="/discharge" element={<DischargeDashboard />} />
+                <Route path="/icu" element={<IcuDashboard />} />
+                <Route path="/beds" element={<BedManagement />} />
+              </>
+            )}
+
+            {(role === "admin" || role === "doctor" || role === "nurse") && (
+              <Route path="/ot" element={<OtDashboard />} />
+            )}
+
+            {(role === "admin" || role === "doctor") && (
+              <Route path="/emr" element={<EmrDashboard />} />
+            )}
+
+            {(role === "admin" || role === "reception") && (
+              <Route path="/insurance" element={<InsuranceDashboard />} />
+            )}
+
+            {(role === "admin" || role === "pharmacist") && (
+              <Route path="/pharmacy" element={<PharmacyDashboard />} />
+            )}
+
+            {(role === "admin" || role === "lab_technician") && (
+              <Route path="/lab" element={<LabDashboard />} />
+            )}
 
             {role === "admin" && (
               <>
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/audit-logs" element={<AuditLogs />} />
-                <Route path="/billing" element={<BillingDashboard />} />
                 <Route path="/billing-settings" element={<BillingSettings />} />
-                <Route path="/ipd" element={<IpdDashboard />} />
-                <Route path="/discharge" element={<DischargeDashboard />} />
                 <Route path="/hr" element={<HrDashboard />} />
-                <Route path="/icu" element={<IcuDashboard />} />
-                <Route path="/lab" element={<LabDashboard />} />
-                <Route path="/pharmacy" element={<PharmacyDashboard />} />
-                <Route path="/beds" element={<BedManagement />} />
               </>
             )}
 
