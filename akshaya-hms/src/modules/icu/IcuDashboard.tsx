@@ -79,7 +79,6 @@ export default function IcuDashboard() {
             age: patient?.age ?? null,
             gender: patient?.gender ?? "",
             doctor_name: form.doctor_name,
-            bed_id: form.bed_id,
             bed_number: form.bed_number,
             diagnosis: form.diagnosis,
             status: form.status,

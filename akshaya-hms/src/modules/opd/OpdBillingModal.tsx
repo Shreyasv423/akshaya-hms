@@ -60,7 +60,7 @@ export default function OpdBillingModal({ patient, onClose, onSuccess }: Props) 
       .insert({
         patient_id: patient.patient_id,
         consultation_fee: consultationFee,
-        discount,
+        discount: discount === "" ? 0 : discount,
         total_amount: total,
         payment_mode: paymentMode
       })

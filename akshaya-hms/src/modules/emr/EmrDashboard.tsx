@@ -16,20 +16,21 @@ export default function EmrDashboard() {
     setPatient(null);
     setTimeline([]);
 
+    const searchVal = searchQuery.trim();
     // 1. Search Patient
     const { data: patientData, error: patientError } = await supabase
       .from("patients")
       .select("*")
-      .or(`phone.eq.${searchQuery},uhid.eq.${searchQuery}`)
-      .single();
+      .or(`phone.eq.${searchVal},uhid.eq.${searchVal}`);
 
-    if (patientError || !patientData) {
+    if (patientError || !patientData || patientData.length === 0) {
       alert("Patient not found.");
       setLoading(false);
       return;
     }
 
-    setPatient(patientData);
+    const patientRecord = patientData[0];
+    setPatient(patientRecord);
 
     // 2. Fetch Timeline Data (OPD, IPD, etc.)
     const evts: any[] = [];
@@ -38,7 +39,7 @@ export default function EmrDashboard() {
     const { data: opdData } = await supabase
       .from("opd_appointments")
       .select("*")
-      .eq("patient_id", patientData.id);
+      .eq("patient_id", patientRecord.id);
     
     if (opdData) {
       opdData.forEach(o => evts.push({
@@ -54,7 +55,7 @@ export default function EmrDashboard() {
     const { data: ipdData } = await supabase
       .from("ipd_admissions")
       .select("*")
-      .eq("patient_id", patientData.id);
+      .eq("patient_id", patientRecord.id);
 
     if (ipdData) {
       ipdData.forEach(i => evts.push({

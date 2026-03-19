@@ -31,6 +31,7 @@ export default function PharmacyDashboard() {
     const [medicines, setMedicines] = useState<Medicine[]>([]);
     const [dispenseHistory, setDispenseHistory] = useState<DispenseRecord[]>([]);
     const [patients, setPatients] = useState<any[]>([]);
+    const [doctors, setDoctors] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [tab, setTab] = useState<"inventory" | "dispense" | "history">("inventory");
     const [search, setSearch] = useState("");
@@ -54,6 +55,7 @@ export default function PharmacyDashboard() {
         fetchMedicines();
         fetchDispenseHistory();
         fetchPatients();
+        fetchDoctors();
     }, []);
 
     const fetchMedicines = async () => {
@@ -71,6 +73,11 @@ export default function PharmacyDashboard() {
     const fetchPatients = async () => {
         const { data } = await supabase.from("patients").select("id, name").order("name");
         setPatients(data || []);
+    };
+
+    const fetchDoctors = async () => {
+        const { data } = await supabase.from("doctors").select("id, name").eq("is_active", true).order("name");
+        setDoctors(data || []);
     };
 
     const handleAddMedicine = async (e: React.FormEvent) => {
@@ -229,7 +236,10 @@ export default function PharmacyDashboard() {
                             <input style={inp} type="number" min={1} placeholder="Qty to dispense" value={dispForm.quantity_dispensed} onChange={e => setDispForm({ ...dispForm, quantity_dispensed: e.target.value })} required />
                         </div>
                         <div style={field}><label style={lbl}>Prescribed By</label>
-                            <input style={inp} placeholder="Dr. Name" value={dispForm.prescribed_by} onChange={e => setDispForm({ ...dispForm, prescribed_by: e.target.value })} required />
+                            <select style={inp} value={dispForm.prescribed_by} onChange={e => setDispForm({ ...dispForm, prescribed_by: e.target.value })} required>
+                                <option value="">Select Doctor</option>
+                                {doctors.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+                            </select>
                         </div>
                         <div style={{ display: "flex", alignItems: "flex-end" }}>
                             <button type="submit" style={primaryBtn} disabled={saving}>{saving ? "Dispensing..." : "Dispense"}</button>

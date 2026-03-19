@@ -4,6 +4,7 @@ import { ShieldAlert, CheckCircle, Clock } from "lucide-react";
 
 export default function InsuranceDashboard() {
   const [claims, setClaims] = useState<any[]>([]);
+  const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Form State
@@ -27,8 +28,14 @@ export default function InsuranceDashboard() {
     setLoading(false);
   };
 
+  const fetchPatients = async () => {
+    const { data } = await supabase.from("patients").select("id, name").order("name");
+    if (data) setPatients(data);
+  };
+
   useEffect(() => {
     fetchClaims();
+    fetchPatients();
   }, []);
 
   const handleCreateClaim = async (e: React.FormEvent) => {
@@ -131,7 +138,12 @@ export default function InsuranceDashboard() {
             <form onSubmit={handleCreateClaim}>
               <div style={{ marginBottom: 12 }}>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Patient Name</label>
-                <input required value={patientName} onChange={e => setPatientName(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid #cbd5e1" }} />
+                <select required value={patientName} onChange={e => setPatientName(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid #cbd5e1", background: "white" }}>
+                  <option value="">Select Patient</option>
+                  {patients.map(p => (
+                    <option key={p.id} value={p.name}>{p.name}</option>
+                  ))}
+                </select>
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Insurance Provider (e.g., Star Health)</label>
