@@ -16,10 +16,44 @@ export default function BedManagement() {
 
     const fetchBeds = async () => {
         setLoading(true);
-        const { data } = await supabase.from("beds").select("*").order("bed_number");
-        setBeds(data || []);
+        const { data: bedsData } = await supabase.from("beds").select("*").order("bed_number");
+        const currentBeds = bedsData || [];
+
+        try {
+            const [{ data: ipdActive }, { data: icuActive }] = await Promise.all([
+                supabase.from("ipd_admissions").select("bed_id").eq("status", "Admitted"),
+                supabase.from("icu_patients").select("bed_id, bed_number")
+            ]);
+
+            const activeBedIds = new Set<string>();
+            const activeBedNumbers = new Set<string>();
+
+            (ipdActive || []).forEach(a => {
+                if (a.bed_id) activeBedIds.add(a.bed_id);
+            });
+            (icuActive || []).forEach(i => {
+                if (i.bed_id) activeBedIds.add(i.bed_id);
+                if (i.bed_number) activeBedNumbers.add(i.bed_number);
+            });
+
+            const updates = currentBeds.map(async (bed) => {
+                const shouldBeOccupied = activeBedIds.has(bed.id) || activeBedNumbers.has(bed.bed_number);
+                if (bed.is_occupied !== shouldBeOccupied) {
+                    await supabase.from("beds").update({ is_occupied: shouldBeOccupied }).eq("id", bed.id);
+                    bed.is_occupied = shouldBeOccupied;
+                }
+            });
+
+            if (updates.length > 0) {
+                await Promise.all(updates);
+            }
+        } catch (err) {
+            console.error("Error auto-syncing bed occupancy:", err);
+        }
+
+        setBeds(currentBeds);
         setLoading(false);
-        return data;
+        return currentBeds;
     };
 
     const initialize25Beds = async () => {
