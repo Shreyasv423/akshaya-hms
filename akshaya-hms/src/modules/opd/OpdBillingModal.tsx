@@ -95,7 +95,7 @@ export default function OpdBillingModal({ patient, onClose, onSuccess }: Props) 
         service_name: s.service_name,
         quantity: s.quantity,
         price: s.price,
-        subtotal: s.quantity * s.price
+        subtotal: Number(s.quantity || 0) * Number(s.price || 0)
       }));
 
       await supabase.from("opd_bill_items").insert(items);

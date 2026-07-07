@@ -5,11 +5,13 @@ import AdmissionList from "./AdmissionList";
 
 export type Admission = {
   id: string;
+  patient_id: string;
   patient_name: string;
   age: number | null;
   gender: string;
-  doctor_name: string;
+  bed_id?: string | null;
   bed_number: string;
+  doctor_name: string;
   diagnosis: string;
   status: string;
   admission_date: string;

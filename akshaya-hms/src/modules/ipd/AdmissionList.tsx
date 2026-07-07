@@ -68,7 +68,12 @@ export default function AdmissionList({ admissions, refresh }: Props) {
 
       {showBilling && (
         <IpdBillingModal
-          admission={showBilling}
+          admission={{
+            ...showBilling,
+            ward: showBilling.bed_number?.startsWith("ICU") ? "ICU" :
+                  showBilling.bed_number?.startsWith("P") ? "Private" :
+                  showBilling.bed_number?.startsWith("SP") ? "Semi-Private" : "General Ward"
+          }}
           onClose={() => setShowBilling(null)}
           onSuccess={refresh}
         />
