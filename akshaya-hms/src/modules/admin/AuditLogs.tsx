@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
 
+type AuditLog = {
+  id: string;
+  created_at: string;
+  type: "internal" | "external";
+  action: string;
+  details?: string | null;
+};
+
 export default function AuditLogs() {
   const [activeTab, setActiveTab] = useState<"internal" | "external">("internal");
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Form state

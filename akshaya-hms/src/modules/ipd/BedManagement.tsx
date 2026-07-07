@@ -22,14 +22,6 @@ export default function BedManagement() {
         return data;
     };
 
-    useEffect(() => {
-        fetchBeds().then(data => {
-            if (data && data.length === 0) {
-                initialize25Beds();
-            }
-        });
-    }, []);
-
     const initialize25Beds = async () => {
         if (initializing) return;
         setInitializing(true);
@@ -58,6 +50,14 @@ export default function BedManagement() {
         }
         setInitializing(false);
     };
+
+    useEffect(() => {
+        fetchBeds().then(data => {
+            if (data && data.length === 0) {
+                initialize25Beds();
+            }
+        });
+    }, []);
 
     const wards = Array.from(new Set(beds.map(b => b.ward)));
 

@@ -2,10 +2,29 @@ import { useState } from "react";
 import { supabase } from "../../services/supabase";
 import { Search, Activity, Stethoscope, Pill, FlaskConical, Calendar } from "lucide-react";
 
+type EMRPatient = {
+  id: string;
+  name: string;
+  uhid: string;
+  phone: string;
+  age?: number | null;
+  gender?: string | null;
+  blood_group?: string | null;
+  address?: string | null;
+};
+
+type TimelineItem = {
+  id: string;
+  date: string;
+  type: "opd" | "ipd" | "lab" | "pharmacy";
+  title: string;
+  desc: string;
+};
+
 export default function EmrDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [patient, setPatient] = useState<any>(null);
-  const [timeline, setTimeline] = useState<any[]>([]);
+  const [patient, setPatient] = useState<EMRPatient | null>(null);
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(false);
 
   const searchPatient = async (e: React.FormEvent) => {
@@ -29,11 +48,11 @@ export default function EmrDashboard() {
       return;
     }
 
-    const patientRecord = patientData[0];
+    const patientRecord = patientData[0] as EMRPatient;
     setPatient(patientRecord);
 
     // 2. Fetch Timeline Data (OPD, IPD, etc.)
-    const evts: any[] = [];
+    const evts: TimelineItem[] = [];
 
     // OPD
     const { data: opdData } = await supabase

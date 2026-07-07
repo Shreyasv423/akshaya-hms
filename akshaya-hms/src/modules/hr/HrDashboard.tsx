@@ -41,16 +41,16 @@ export default function HrDashboard() {
         password: "", create_login: false
     });
 
-    useEffect(() => {
-        fetchStaff();
-    }, []);
-
     const fetchStaff = async () => {
         setLoading(true);
         const { data } = await supabase.from("staff").select("*").order("name");
         setStaff((data || []) as Staff[]);
         setLoading(false);
     };
+
+    useEffect(() => {
+        fetchStaff();
+    }, []);
 
     const openAddForm = () => {
         setEditStaff(null);

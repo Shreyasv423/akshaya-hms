@@ -1,23 +1,32 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
 
+type PatientBillingDetails = {
+  id?: string;
+  patient_id: string;
+  patient_name: string;
+  phone?: string;
+};
+
 type Props = {
-  patient: any;
+  patient: PatientBillingDetails;
   onClose: () => void;
   onSuccess?: () => void;
 };
 
+type BillService = {
+  service_name: string;
+  quantity: number | "";
+  price: number | "";
+};
+
 export default function OpdBillingModal({ patient, onClose, onSuccess }: Props) {
   const [consultationFee, setConsultationFee] = useState(0);
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<BillService[]>([]);
   const [discount, setDiscount] = useState<number | "">("");
   const [discountType, setDiscountType] = useState<"flat" | "percent">("flat");
   const [paymentMode, setPaymentMode] = useState("Cash");
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    fetchFee();
-  }, []);
 
   const fetchFee = async () => {
     const { data } = await supabase
@@ -29,13 +38,20 @@ export default function OpdBillingModal({ patient, onClose, onSuccess }: Props) 
     if (data) setConsultationFee(data.consultation_fee);
   };
 
+  useEffect(() => {
+    fetchFee();
+  }, []);
+
   const addService = () => {
     setServices([...services, { service_name: "", quantity: 1, price: 0 }]);
   };
 
-  const updateService = (index: number, field: string, value: any) => {
+  const updateService = <K extends keyof BillService>(index: number, field: K, value: BillService[K]) => {
     const updated = [...services];
-    updated[index][field] = value;
+    updated[index] = {
+      ...updated[index],
+      [field]: value
+    };
     setServices(updated);
   };
 
@@ -46,7 +62,7 @@ export default function OpdBillingModal({ patient, onClose, onSuccess }: Props) 
 
   const subtotal =
     (typeof consultationFee === 'number' ? consultationFee : Number(consultationFee || 0)) +
-    services.reduce((sum, s) => sum + (s.quantity || 0) * (s.price || 0), 0);
+    services.reduce((sum, s) => sum + (Number(s.quantity) || 0) * (Number(s.price) || 0), 0);
 
   const discountVal = Number(discount) || 0;
   const calculatedDiscount = discountType === "percent" ? (subtotal * discountVal) / 100 : discountVal;

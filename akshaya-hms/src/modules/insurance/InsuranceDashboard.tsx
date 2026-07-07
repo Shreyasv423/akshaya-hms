@@ -2,9 +2,18 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
 import { ShieldAlert, CheckCircle, Clock } from "lucide-react";
 
+type InsuranceClaim = {
+  id: string;
+  patient_name: string;
+  insurance_provider: string;
+  policy_number: string;
+  claim_amount: number;
+  status: "Pending" | "Approved" | "Rejected";
+};
+
 export default function InsuranceDashboard() {
-  const [claims, setClaims] = useState<any[]>([]);
-  const [patients, setPatients] = useState<any[]>([]);
+  const [claims, setClaims] = useState<InsuranceClaim[]>([]);
+  const [patients, setPatients] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Form State
@@ -23,7 +32,7 @@ export default function InsuranceDashboard() {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setClaims(data);
+      setClaims(data as InsuranceClaim[]);
     }
     setLoading(false);
   };

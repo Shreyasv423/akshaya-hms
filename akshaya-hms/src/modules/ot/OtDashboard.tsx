@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
 
+type SurgerySchedule = {
+  id: string;
+  patient_name: string;
+  surgeon_name: string;
+  surgery_type: string;
+  ot_room: string;
+  scheduled_time: string;
+  status: "Scheduled" | "In Progress" | "Completed";
+};
+
 export default function OtDashboard() {
-  const [surgeries, setSurgeries] = useState<any[]>([]);
-  const [patients, setPatients] = useState<any[]>([]);
+  const [surgeries, setSurgeries] = useState<SurgerySchedule[]>([]);
+  const [patients, setPatients] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Form State
@@ -23,7 +33,7 @@ export default function OtDashboard() {
       .order("scheduled_time", { ascending: true });
 
     if (!error && data) {
-      setSurgeries(data);
+      setSurgeries(data as SurgerySchedule[]);
     }
     setLoading(false);
   };

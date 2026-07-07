@@ -26,11 +26,6 @@ export default function AppointmentForm({ onSuccess, initialPatientId }: Props) 
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    fetchPatients();
-    fetchDoctors();
-  }, []);
-
   const fetchPatients = async () => {
     const { data } = await supabase
       .from("patients")
@@ -49,6 +44,11 @@ export default function AppointmentForm({ onSuccess, initialPatientId }: Props) 
 
     setDoctors(data || []);
   };
+
+  useEffect(() => {
+    fetchPatients();
+    fetchDoctors();
+  }, []);
 
   const createAppointment = async () => {
     if (!selectedPatientId) {

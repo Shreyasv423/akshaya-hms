@@ -9,10 +9,10 @@ export default function AdminDashboard() {
   const [billsToday, setBillsToday] = useState(0);
   const [revenueToday, setRevenueToday] = useState(0);
 
-  const [recentBills, setRecentBills] = useState<any[]>([]);
-  const [recentOpd, setRecentOpd] = useState<any[]>([]);
+  const [recentBills, setRecentBills] = useState<{ id: string; total_amount: number; created_at: string }[]>([]);
+  const [recentOpd, setRecentOpd] = useState<{ id: string; patient_name: string; doctor_name: string }[]>([]);
   const [totalBeds, setTotalBeds] = useState(0);
-  const [revenueData, setRevenueData] = useState<any[]>([]);
+  const [revenueData, setRevenueData] = useState<{ name: string; revenue: number }[]>([]);
 
   async function fetchStats() {
     const today = new Date().toISOString().split("T")[0];
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
         <StatCard title="Revenue Today (₹)" value={revenueToday} highlight />
         <StatCard
           title={`Bed Occupancy (${occupancyPercent}%)`}
-          value={`${ipdActive}/${totalBeds}` as any}
+          value={`${ipdActive}/${totalBeds}`}
           warning
         />
       </div>
@@ -153,7 +153,7 @@ function StatCard({
   warning
 }: {
   title: string;
-  value: any;
+  value: string | number;
   highlight?: boolean;
   warning?: boolean;
 }) {

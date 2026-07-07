@@ -37,11 +37,6 @@ export default function FrontDeskDashboard() {
     const [showOpdForm, setShowOpdForm] = useState(false);
     const [prefilledPatientId, setPrefilledPatientId] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetchPatients();
-        fetchAppointments();
-    }, []);
-
     const fetchPatients = async () => {
         setLoadingPatients(true);
         const { data } = await supabase.from("patients").select("*").order("created_at", { ascending: false });
@@ -60,6 +55,11 @@ export default function FrontDeskDashboard() {
         setAppointments(data || []);
         setLoadingOpd(false);
     };
+
+    useEffect(() => {
+        fetchPatients();
+        fetchAppointments();
+    }, []);
 
     const handleBookAppointment = (patientId: string) => {
         setPrefilledPatientId(patientId);

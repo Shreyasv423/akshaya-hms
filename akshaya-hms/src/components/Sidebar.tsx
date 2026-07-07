@@ -24,43 +24,45 @@ type Props = {
   onClose: () => void;
 };
 
+const linkStyle = (isActive: boolean) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  padding: "11px 16px",
+  borderRadius: 10,
+  fontWeight: 500,
+  fontSize: 14,
+  marginBottom: 4,
+  textDecoration: "none",
+  background: isActive ? "#ecfdf5" : "transparent",
+  color: isActive ? "#047857" : "#334155",
+  borderLeft: isActive ? "3px solid #10b981" : "3px solid transparent",
+  cursor: "pointer",
+  transition: "background 0.15s, color 0.15s"
+});
+
+const NavItem = ({
+  to,
+  icon,
+  label,
+  onClick
+}: {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) => (
+  <NavLink
+    to={to}
+    style={({ isActive }) => linkStyle(isActive)}
+    onClick={onClick}
+  >
+    {icon}
+    {label}
+  </NavLink>
+);
+
 export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
-  const linkStyle = (isActive: boolean) => ({
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "11px 16px",
-    borderRadius: 10,
-    fontWeight: 500,
-    fontSize: 14,
-    marginBottom: 4,
-    textDecoration: "none",
-    background: isActive ? "#ecfdf5" : "transparent",
-    color: isActive ? "#047857" : "#334155",
-    borderLeft: isActive ? "3px solid #10b981" : "3px solid transparent",
-    cursor: "pointer",
-    transition: "background 0.15s, color 0.15s"
-  });
-
-  const NavItem = ({
-    to,
-    icon,
-    label
-  }: {
-    to: string;
-    icon: React.ReactNode;
-    label: string;
-  }) => (
-    <NavLink
-      to={to}
-      style={({ isActive }) => linkStyle(isActive)}
-      onClick={onClose}
-    >
-      {icon}
-      {label}
-    </NavLink>
-  );
-
   return (
     <>
       {/* Overlay — only on mobile when sidebar is open */}
@@ -87,8 +89,8 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
           {role === "admin" && (
             <>
               <div style={sectionLabel}>Overview</div>
-              <NavItem to="/admin" icon={<LayoutDashboard size={17} />} label="Dashboard" />
-              <NavItem to="/audit-logs" icon={<ShieldAlert size={17} />} label="Audit Logs" />
+              <NavItem to="/admin" icon={<LayoutDashboard size={17} />} label="Dashboard" onClick={onClose} />
+              <NavItem to="/audit-logs" icon={<ShieldAlert size={17} />} label="Audit Logs" onClick={onClose} />
             </>
           )}
 
@@ -96,16 +98,16 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
           {(role === "admin" || role === "reception") && (
             <>
               <div style={sectionLabel}>Front Desk</div>
-              <NavItem to="/front-desk" icon={<Monitor size={17} />} label="Front Desk" />
-              <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" />
-              <NavItem to="/insurance" icon={<FilePlus size={17} />} label="TPA Claims" />
+              <NavItem to="/front-desk" icon={<Monitor size={17} />} label="Front Desk" onClick={onClose} />
+              <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" onClick={onClose} />
+              <NavItem to="/insurance" icon={<FilePlus size={17} />} label="TPA Claims" onClick={onClose} />
             </>
           )}
 
           {role === "doctor" && (
             <>
               <div style={sectionLabel}>Clinic</div>
-              <NavItem to="/opd" icon={<Stethoscope size={17} />} label="OPD" />
+              <NavItem to="/opd" icon={<Stethoscope size={17} />} label="OPD" onClick={onClose} />
             </>
           )}
 
@@ -113,7 +115,7 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
           {(role === "admin" || role === "doctor") && (
             <>
               <div style={sectionLabel}>Records</div>
-              <NavItem to="/emr" icon={<ClipboardList size={17} />} label="EMR Timeline" />
+              <NavItem to="/emr" icon={<ClipboardList size={17} />} label="EMR Timeline" onClick={onClose} />
             </>
           )}
 
@@ -121,10 +123,10 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
           {(role === "admin" || role === "nurse") && (
             <>
               <div style={sectionLabel}>Hospital</div>
-              <NavItem to="/ipd" icon={<BedDouble size={17} />} label="IPD" />
-              <NavItem to="/beds" icon={<Monitor size={17} />} label="Bed Management" />
-              <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" />
-              <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" />
+              <NavItem to="/ipd" icon={<BedDouble size={17} />} label="IPD" onClick={onClose} />
+              <NavItem to="/beds" icon={<Monitor size={17} />} label="Bed Management" onClick={onClose} />
+              <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" onClick={onClose} />
+              <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" onClick={onClose} />
             </>
           )}
 
@@ -132,7 +134,7 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
           {(role === "admin" || role === "doctor" || role === "nurse") && (
             <>
               <div style={sectionLabel}>Surgery</div>
-              <NavItem to="/ot" icon={<Scissors size={17} />} label="Operation Theatre" />
+              <NavItem to="/ot" icon={<Scissors size={17} />} label="Operation Theatre" onClick={onClose} />
             </>
           )}
 
@@ -141,10 +143,10 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
             <>
               <div style={sectionLabel}>Services</div>
               {(role === "admin" || role === "lab_technician") && (
-                <NavItem to="/lab" icon={<FlaskConical size={17} />} label="Laboratory" />
+                <NavItem to="/lab" icon={<FlaskConical size={17} />} label="Laboratory" onClick={onClose} />
               )}
               {(role === "admin" || role === "pharmacist") && (
-                <NavItem to="/pharmacy" icon={<Pill size={17} />} label="Pharmacy" />
+                <NavItem to="/pharmacy" icon={<Pill size={17} />} label="Pharmacy" onClick={onClose} />
               )}
             </>
           )}
@@ -153,8 +155,8 @@ export default function Sidebar({ role, isOpen, isMobile, onClose }: Props) {
           {role === "admin" && (
             <>
               <div style={sectionLabel}>Management</div>
-              <NavItem to="/hr" icon={<Activity size={17} />} label="HR" />
-              <NavItem to="/billing-settings" icon={<Settings size={17} />} label="Settings" />
+              <NavItem to="/hr" icon={<Activity size={17} />} label="HR" onClick={onClose} />
+              <NavItem to="/billing-settings" icon={<Settings size={17} />} label="Settings" onClick={onClose} />
             </>
           )}
         </nav>

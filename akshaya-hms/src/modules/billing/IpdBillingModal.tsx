@@ -2,17 +2,32 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
 import { X } from "lucide-react";
 
+type IpdAdmissionDetails = {
+    id: string;
+    patient_id: string;
+    patient_name: string;
+    admission_date: string;
+    bed_id?: string | null;
+    bed_number: string;
+    ward: string;
+};
+
 type Props = {
-    admission: any;
+    admission: IpdAdmissionDetails;
     onClose: () => void;
     onSuccess: () => void;
+};
+
+type AdditionalCharge = {
+    name: string;
+    amount: number | "";
 };
 
 export default function IpdBillingModal({ admission, onClose, onSuccess }: Props) {
     const [loading, setLoading] = useState(false);
     const [daysStayed, setDaysStayed] = useState(0);
     const [bedChargePerDay, setBedChargePerDay] = useState(0);
-    const [additionalCharges, setAdditionalCharges] = useState<{ name: string, amount: number | "" }[]>([]);
+    const [additionalCharges, setAdditionalCharges] = useState<AdditionalCharge[]>([]);
     const [discount, setDiscount] = useState<number | "">("");
     const [discountType, setDiscountType] = useState<"flat" | "percent">("flat");
     const [paymentMode, setPaymentMode] = useState("Cash");
@@ -41,12 +56,15 @@ export default function IpdBillingModal({ admission, onClose, onSuccess }: Props
     const grandTotal = Math.max(subTotal - calculatedDiscount, 0);
 
     const addCharge = () => {
-        setAdditionalCharges([...additionalCharges, { name: "", amount: "" as number | "" }]);
+        setAdditionalCharges([...additionalCharges, { name: "", amount: "" }]);
     };
 
-    const updateCharge = (index: number, field: string, value: any) => {
+    const updateCharge = <K extends keyof AdditionalCharge>(index: number, field: K, value: AdditionalCharge[K]) => {
         const updated = [...additionalCharges];
-        (updated[index] as any)[field] = value;
+        updated[index] = {
+            ...updated[index],
+            [field]: value
+        };
         setAdditionalCharges(updated);
     };
 
@@ -76,6 +94,8 @@ export default function IpdBillingModal({ admission, onClose, onSuccess }: Props
         // 3. Free bed
         if (admission.bed_id) {
             await supabase.from("beds").update({ is_occupied: false }).eq("id", admission.bed_id);
+        } else if (admission.bed_number) {
+            await supabase.from("beds").update({ is_occupied: false }).eq("bed_number", admission.bed_number);
         }
 
         setLoading(false);

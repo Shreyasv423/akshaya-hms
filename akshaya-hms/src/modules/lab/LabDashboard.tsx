@@ -37,7 +37,7 @@ const TEST_LIST = [
 
 export default function LabDashboard() {
     const [orders, setOrders] = useState<LabOrder[]>([]);
-    const [patients, setPatients] = useState<any[]>([]);
+    const [patients, setPatients] = useState<{ id: string; name: string }[]>([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
@@ -55,11 +55,6 @@ export default function LabDashboard() {
     const [resultNotes, setResultNotes] = useState("");
     const [savingResult, setSavingResult] = useState(false);
 
-    useEffect(() => {
-        fetchOrders();
-        fetchPatients();
-    }, []);
-
     const fetchOrders = async () => {
         setLoading(true);
         const { data } = await supabase
@@ -74,6 +69,11 @@ export default function LabDashboard() {
         const { data } = await supabase.from("patients").select("id, name").order("name");
         setPatients(data || []);
     };
+
+    useEffect(() => {
+        fetchOrders();
+        fetchPatients();
+    }, []);
 
     const handleCreateOrder = async (e: React.FormEvent) => {
         e.preventDefault();

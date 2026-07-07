@@ -30,8 +30,8 @@ const LOW_STOCK_THRESHOLD = 20;
 export default function PharmacyDashboard() {
     const [medicines, setMedicines] = useState<Medicine[]>([]);
     const [dispenseHistory, setDispenseHistory] = useState<DispenseRecord[]>([]);
-    const [patients, setPatients] = useState<any[]>([]);
-    const [doctors, setDoctors] = useState<any[]>([]);
+    const [patients, setPatients] = useState<{ id: string; name: string }[]>([]);
+    const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([]);
     const [loading, setLoading] = useState(false);
     const [tab, setTab] = useState<"inventory" | "dispense" | "history">("inventory");
     const [search, setSearch] = useState("");
@@ -50,13 +50,6 @@ export default function PharmacyDashboard() {
         medicine_id: "", patient_id: "", quantity_dispensed: "",
         prescribed_by: ""
     });
-
-    useEffect(() => {
-        fetchMedicines();
-        fetchDispenseHistory();
-        fetchPatients();
-        fetchDoctors();
-    }, []);
 
     const fetchMedicines = async () => {
         setLoading(true);
@@ -79,6 +72,13 @@ export default function PharmacyDashboard() {
         const { data } = await supabase.from("doctors").select("id, name").eq("is_active", true).order("name");
         setDoctors(data || []);
     };
+
+    useEffect(() => {
+        fetchMedicines();
+        fetchDispenseHistory();
+        fetchPatients();
+        fetchDoctors();
+    }, []);
 
     const handleAddMedicine = async (e: React.FormEvent) => {
         e.preventDefault();

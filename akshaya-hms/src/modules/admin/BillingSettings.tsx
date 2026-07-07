@@ -24,13 +24,6 @@ export default function GeneralSettings() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  useEffect(() => {
-    fetchSettings();
-    const handleResize = () => setIsMobile(window.innerWidth < 1024);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const fetchSettings = async () => {
     setLoading(true);
     const { data } = await supabase.from("hospital_settings").select("*").single();
@@ -43,6 +36,13 @@ export default function GeneralSettings() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchSettings();
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);

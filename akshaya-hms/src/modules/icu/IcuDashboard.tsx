@@ -23,13 +23,13 @@ type IcuPatient = {
 
 export default function IcuDashboard() {
     const [patients, setPatients] = useState<IcuPatient[]>([]);
-    const [allPatients, setAllPatients] = useState<any[]>([]);
-    const [doctors, setDoctors] = useState<any[]>([]);
-    const [beds, setBeds] = useState<any[]>([]);
+    const [allPatients, setAllPatients] = useState<{ id: string; name: string; age: number | null; gender: string }[]>([]);
+    const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([]);
+    const [beds, setBeds] = useState<{ id: string; bed_number: string; ward: string }[]>([]);
     const [loading, setLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState<IcuPatient | null>(null);
-    const [billingPatient, setBillingPatient] = useState<IcuPatient | null>(null);
+    const [billingPatient, setBillingPatient] = useState<(IcuPatient & { ward: string }) | null>(null);
     const [saving, setSaving] = useState(false);
 
     // Admission form
@@ -41,11 +41,6 @@ export default function IcuDashboard() {
     // Vitals form
     const [vitals, setVitals] = useState({ bp: "", pulse: "", spo2: "", temp: "" });
     const [savingVitals, setSavingVitals] = useState(false);
-
-    useEffect(() => {
-        fetchIcuPatients();
-        fetchDropdownData();
-    }, []);
 
     const fetchDropdownData = async () => {
         const [{ data: p }, { data: d }, { data: b }] = await Promise.all([
@@ -68,6 +63,11 @@ export default function IcuDashboard() {
         setLoading(false);
     };
 
+    useEffect(() => {
+        fetchIcuPatients();
+        fetchDropdownData();
+    }, []);
+
     const handleAdmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.patient_id || !form.doctor_name || !form.bed_id || !form.diagnosis) return;
@@ -79,6 +79,7 @@ export default function IcuDashboard() {
             age: patient?.age ?? null,
             gender: patient?.gender ?? "",
             doctor_name: form.doctor_name,
+            bed_id: form.bed_id,
             bed_number: form.bed_number,
             diagnosis: form.diagnosis,
             status: form.status,
@@ -117,7 +118,7 @@ export default function IcuDashboard() {
     };
 
     const discharge = async (patient: IcuPatient) => {
-        setBillingPatient({ ...patient, ward: "ICU" } as any);
+        setBillingPatient({ ...patient, ward: "ICU" });
     };
 
     const handleDischargeSuccess = async () => {

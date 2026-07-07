@@ -34,10 +34,6 @@ export default function AdmissionForm({ onSuccess }: Props) {
   const [bedId, setBedId] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   async function fetchData() {
     const { data: p } = await supabase.from("patients").select("*");
     const { data: d } = await supabase
@@ -53,6 +49,10 @@ export default function AdmissionForm({ onSuccess }: Props) {
     setDoctors(d || []);
     setBeds(b || []);
   }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

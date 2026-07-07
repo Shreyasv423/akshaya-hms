@@ -1,0 +1,1152 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx
+   90:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:90:16
+  88 |             <>
+  89 |               <div style={sectionLabel}>Overview</div>
+> 90 |               <NavItem to="/admin" icon={<LayoutDashboard size={17} />} label="Dashboard" />
+     |                ^^^^^^^ This component is created during render
+  91 |               <NavItem to="/audit-logs" icon={<ShieldAlert size={17} />} label="Audit Logs" />
+  92 |             </>
+  93 |           )}
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                                    react-hooks/static-components
+   91:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:91:16
+  89 |               <div style={sectionLabel}>Overview</div>
+  90 |               <NavItem to="/admin" icon={<LayoutDashboard size={17} />} label="Dashboard" />
+> 91 |               <NavItem to="/audit-logs" icon={<ShieldAlert size={17} />} label="Audit Logs" />
+     |                ^^^^^^^ This component is created during render
+  92 |             </>
+  93 |           )}
+  94 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                                                   react-hooks/static-components
+   99:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:99:16
+   97 |             <>
+   98 |               <div style={sectionLabel}>Front Desk</div>
+>  99 |               <NavItem to="/front-desk" icon={<Monitor size={17} />} label="Front Desk" />
+      |                ^^^^^^^ This component is created during render
+  100 |               <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" />
+  101 |               <NavItem to="/insurance" icon={<FilePlus size={17} />} label="TPA Claims" />
+  102 |             </>
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                         react-hooks/static-components
+  100:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:100:16
+   98 |               <div style={sectionLabel}>Front Desk</div>
+   99 |               <NavItem to="/front-desk" icon={<Monitor size={17} />} label="Front Desk" />
+> 100 |               <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" />
+      |                ^^^^^^^ This component is created during render
+  101 |               <NavItem to="/insurance" icon={<FilePlus size={17} />} label="TPA Claims" />
+  102 |             </>
+  103 |           )}
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                          react-hooks/static-components
+  101:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:101:16
+   99 |               <NavItem to="/front-desk" icon={<Monitor size={17} />} label="Front Desk" />
+  100 |               <NavItem to="/billing" icon={<Receipt size={17} />} label="Billing" />
+> 101 |               <NavItem to="/insurance" icon={<FilePlus size={17} />} label="TPA Claims" />
+      |                ^^^^^^^ This component is created during render
+  102 |             </>
+  103 |           )}
+  104 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                   react-hooks/static-components
+  108:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:108:16
+  106 |             <>
+  107 |               <div style={sectionLabel}>Clinic</div>
+> 108 |               <NavItem to="/opd" icon={<Stethoscope size={17} />} label="OPD" />
+      |                ^^^^^^^ This component is created during render
+  109 |             </>
+  110 |           )}
+  111 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                                                                                                                                         react-hooks/static-components
+  116:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:116:16
+  114 |             <>
+  115 |               <div style={sectionLabel}>Records</div>
+> 116 |               <NavItem to="/emr" icon={<ClipboardList size={17} />} label="EMR Timeline" />
+      |                ^^^^^^^ This component is created during render
+  117 |             </>
+  118 |           )}
+  119 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                                                                                                                             react-hooks/static-components
+  124:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:124:16
+  122 |             <>
+  123 |               <div style={sectionLabel}>Hospital</div>
+> 124 |               <NavItem to="/ipd" icon={<BedDouble size={17} />} label="IPD" />
+      |                ^^^^^^^ This component is created during render
+  125 |               <NavItem to="/beds" icon={<Monitor size={17} />} label="Bed Management" />
+  126 |               <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" />
+  127 |               <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" />
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>   react-hooks/static-components
+  125:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:125:16
+  123 |               <div style={sectionLabel}>Hospital</div>
+  124 |               <NavItem to="/ipd" icon={<BedDouble size={17} />} label="IPD" />
+> 125 |               <NavItem to="/beds" icon={<Monitor size={17} />} label="Bed Management" />
+      |                ^^^^^^^ This component is created during render
+  126 |               <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" />
+  127 |               <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" />
+  128 |             </>
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>  react-hooks/static-components
+  126:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:126:16
+  124 |               <NavItem to="/ipd" icon={<BedDouble size={17} />} label="IPD" />
+  125 |               <NavItem to="/beds" icon={<Monitor size={17} />} label="Bed Management" />
+> 126 |               <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" />
+      |                ^^^^^^^ This component is created during render
+  127 |               <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" />
+  128 |             </>
+  129 |           )}
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                            react-hooks/static-components
+  127:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:127:16
+  125 |               <NavItem to="/beds" icon={<Monitor size={17} />} label="Bed Management" />
+  126 |               <NavItem to="/icu" icon={<HeartPulse size={17} />} label="ICU" />
+> 127 |               <NavItem to="/discharge" icon={<FileText size={17} />} label="Discharge" />
+      |                ^^^^^^^ This component is created during render
+  128 |             </>
+  129 |           )}
+  130 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                           react-hooks/static-components
+  135:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:135:16
+  133 |             <>
+  134 |               <div style={sectionLabel}>Surgery</div>
+> 135 |               <NavItem to="/ot" icon={<Scissors size={17} />} label="Operation Theatre" />
+      |                ^^^^^^^ This component is created during render
+  136 |             </>
+  137 |           )}
+  138 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                                                                                                                              react-hooks/static-components
+  144:18  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:144:18
+  142 |               <div style={sectionLabel}>Services</div>
+  143 |               {(role === "admin" || role === "lab_technician") && (
+> 144 |                 <NavItem to="/lab" icon={<FlaskConical size={17} />} label="Laboratory" />
+      |                  ^^^^^^^ This component is created during render
+  145 |               )}
+  146 |               {(role === "admin" || role === "pharmacist") && (
+  147 |                 <NavItem to="/pharmacy" icon={<Pill size={17} />} label="Pharmacy" />
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                            react-hooks/static-components
+  147:18  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:147:18
+  145 |               )}
+  146 |               {(role === "admin" || role === "pharmacist") && (
+> 147 |                 <NavItem to="/pharmacy" icon={<Pill size={17} />} label="Pharmacy" />
+      |                  ^^^^^^^ This component is created during render
+  148 |               )}
+  149 |             </>
+  150 |           )}
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                                                                                                    react-hooks/static-components
+  156:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:156:16
+  154 |             <>
+  155 |               <div style={sectionLabel}>Management</div>
+> 156 |               <NavItem to="/hr" icon={<Activity size={17} />} label="HR" />
+      |                ^^^^^^^ This component is created during render
+  157 |               <NavItem to="/billing-settings" icon={<Settings size={17} />} label="Settings" />
+  158 |             </>
+  159 |           )}
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                                          react-hooks/static-components
+  157:16  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:157:16
+  155 |               <div style={sectionLabel}>Management</div>
+  156 |               <NavItem to="/hr" icon={<Activity size={17} />} label="HR" />
+> 157 |               <NavItem to="/billing-settings" icon={<Settings size={17} />} label="Settings" />
+      |                ^^^^^^^ This component is created during render
+  158 |             </>
+  159 |           )}
+  160 |         </nav>
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/components/Sidebar.tsx:45:19
+  43 |   });
+  44 |
+> 45 |   const NavItem = ({
+     |                   ^^
+> 46 |     to,
+     | ^^^^^^^
+> 47 |     icon,
+     …
+     | ^^^^^^^
+> 61 |     </NavLink>
+     | ^^^^^^^
+> 62 |   );
+     | ^^^^ The component is created during render here
+  63 |
+  64 |   return (
+  65 |     <>                                                                                                                                          react-hooks/static-components
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/admin/AdminDashboard.tsx
+   12:50  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+   13:46  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+   15:50  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+   78:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/admin/AdminDashboard.tsx:78:5
+  76 |
+  77 |   useEffect(() => {
+> 78 |     fetchStats();
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  79 |   }, []);
+  80 |
+  81 |   const occupancyPercent =  react-hooks/set-state-in-effect
+   97:49  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  156:10  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/admin/AuditLogs.tsx
+   6:36  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+  37:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/admin/AuditLogs.tsx:37:5
+  35 |
+  36 |   useEffect(() => {
+> 37 |     fetchLogs();
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |   }, [activeTab]);
+  39 |
+  40 |   const handleAddLog = async (e: React.FormEvent) => {  react-hooks/set-state-in-effect
+  38:6   warning  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/exhaustive-deps
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/admin/BillingSettings.tsx
+  28:5  error    Error: Cannot access variable before it is declared
+
+`fetchSettings` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/admin/BillingSettings.tsx:28:5
+  26 |
+  27 |   useEffect(() => {
+> 28 |     fetchSettings();
+     |     ^^^^^^^^^^^^^ `fetchSettings` accessed before it is declared
+  29 |     const handleResize = () => setIsMobile(window.innerWidth < 1024);
+  30 |     window.addEventListener("resize", handleResize);
+  31 |     return () => window.removeEventListener("resize", handleResize);
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/admin/BillingSettings.tsx:34:3
+  32 |   }, []);
+  33 |
+> 34 |   const fetchSettings = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |     setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 36 |     const { data } = await supabase.from("hospital_settings").select("*").single();
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 44 |     setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 45 |   };
+     | ^^^^^ `fetchSettings` is declared here
+  46 |
+  47 |   const handleSave = async () => {
+  48 |     setSaving(true);  react-hooks/immutability
+  32:6  warning  React Hook useEffect has a missing dependency: 'fetchSettings'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react-hooks/exhaustive-deps
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/billing/BillingDashboard.tsx
+  47:33  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  53:25  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  61:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/billing/BillingDashboard.tsx:61:9
+  59 |
+  60 |     useEffect(() => {
+> 61 |         fetchBills();
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  62 |
+  63 |         // Subscribe to real-time changes
+  64 |         const channel = supabase  react-hooks/set-state-in-effect
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/billing/IpdBillingModal.tsx
+   6:16  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  25:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/billing/IpdBillingModal.tsx:25:9
+  23 |         const diffTime = Math.abs(disDate.getTime() - adDate.getTime());
+  24 |         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+> 25 |         setDaysStayed(diffDays);
+     |         ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  26 |
+  27 |         // Estimate bed charge based on ward name
+  28 |         const ward = admission.ward || "";  react-hooks/set-state-in-effect
+  47:64  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  49:28  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/emr/EmrDashboard.tsx
+   7:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   8:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/frontdesk/FrontDeskDashboard.tsx
+   41:9   error  Error: Cannot access variable before it is declared
+
+`fetchPatients` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/frontdesk/FrontDeskDashboard.tsx:41:9
+  39 |
+  40 |     useEffect(() => {
+> 41 |         fetchPatients();
+     |         ^^^^^^^^^^^^^ `fetchPatients` accessed before it is declared
+  42 |         fetchAppointments();
+  43 |     }, []);
+  44 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/frontdesk/FrontDeskDashboard.tsx:45:5
+  43 |     }, []);
+  44 |
+> 45 |     const fetchPatients = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |         setLoadingPatients(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |         const { data } = await supabase.from("patients").select("*").order("created_at", { ascending: false });
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |         setPatients(data || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 49 |         setLoadingPatients(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |     };
+     | ^^^^^^^ `fetchPatients` is declared here
+  51 |
+  52 |     const fetchAppointments = async () => {
+  53 |         setLoadingOpd(true);  react-hooks/immutability
+   42:9   error  Error: Cannot access variable before it is declared
+
+`fetchAppointments` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/frontdesk/FrontDeskDashboard.tsx:42:9
+  40 |     useEffect(() => {
+  41 |         fetchPatients();
+> 42 |         fetchAppointments();
+     |         ^^^^^^^^^^^^^^^^^ `fetchAppointments` accessed before it is declared
+  43 |     }, []);
+  44 |
+  45 |     const fetchPatients = async () => {
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/frontdesk/FrontDeskDashboard.tsx:52:5
+  50 |     };
+  51 |
+> 52 |     const fetchAppointments = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 53 |         setLoadingOpd(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 54 |         const today = new Date().toISOString().split("T")[0];
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 61 |         setLoadingOpd(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 62 |     };
+     | ^^^^^^^ `fetchAppointments` is declared here
+  63 |
+  64 |     const handleBookAppointment = (patientId: string) => {
+  65 |         setPrefilledPatientId(patientId);                                                                react-hooks/immutability
+  219:63  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/hr/HrDashboard.tsx
+  45:9   error  Error: Cannot access variable before it is declared
+
+`fetchStaff` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/hr/HrDashboard.tsx:45:9
+  43 |
+  44 |     useEffect(() => {
+> 45 |         fetchStaff();
+     |         ^^^^^^^^^^ `fetchStaff` accessed before it is declared
+  46 |     }, []);
+  47 |
+  48 |     const fetchStaff = async () => {
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/hr/HrDashboard.tsx:48:5
+  46 |     }, []);
+  47 |
+> 48 |     const fetchStaff = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 49 |         setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |         const { data } = await supabase.from("staff").select("*").order("name");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 51 |         setStaff((data || []) as Staff[]);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 52 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 53 |     };
+     | ^^^^^^^ `fetchStaff` is declared here
+  54 |
+  55 |     const openAddForm = () => {
+  56 |         setEditStaff(null);  react-hooks/immutability
+  89:24  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-explicit-any
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/icu/IcuDashboard.tsx
+   26:52  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+   27:44  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+   28:38  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+   46:9   error  Error: Cannot access variable before it is declared
+
+`fetchIcuPatients` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/icu/IcuDashboard.tsx:46:9
+  44 |
+  45 |     useEffect(() => {
+> 46 |         fetchIcuPatients();
+     |         ^^^^^^^^^^^^^^^^ `fetchIcuPatients` accessed before it is declared
+  47 |         fetchDropdownData();
+  48 |     }, []);
+  49 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/icu/IcuDashboard.tsx:61:5
+  59 |     };
+  60 |
+> 61 |     const fetchIcuPatients = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 62 |         setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 63 |         const { data } = await supabase
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 64 |             .from("icu_patients")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 65 |             .select("*")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 66 |             .order("created_at", { ascending: false });
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 67 |         setPatients((data || []) as IcuPatient[]);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 68 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |     };
+     | ^^^^^^^ `fetchIcuPatients` is declared here
+  70 |
+  71 |     const handleAdmit = async (e: React.FormEvent) => {
+  72 |         e.preventDefault();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react-hooks/immutability
+   47:9   error  Error: Cannot access variable before it is declared
+
+`fetchDropdownData` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/icu/IcuDashboard.tsx:47:9
+  45 |     useEffect(() => {
+  46 |         fetchIcuPatients();
+> 47 |         fetchDropdownData();
+     |         ^^^^^^^^^^^^^^^^^ `fetchDropdownData` accessed before it is declared
+  48 |     }, []);
+  49 |
+  50 |     const fetchDropdownData = async () => {
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/icu/IcuDashboard.tsx:50:5
+  48 |     }, []);
+  49 |
+> 50 |     const fetchDropdownData = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 51 |         const [{ data: p }, { data: d }, { data: b }] = await Promise.all([
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 52 |             supabase.from("patients").select("id, name, age, gender").order("name"),
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 53 |             supabase.from("doctors").select("id, name").eq("is_active", true).order("name"),
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 54 |             supabase.from("beds").select("id, bed_number, ward").eq("is_occupied", false)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |         ]);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 56 |         setAllPatients(p || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 57 |         setDoctors(d || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 58 |         setBeds((b || []).filter(bed => bed.ward.toLowerCase().includes("icu")));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |     };
+     | ^^^^^^^ `fetchDropdownData` is declared here
+  60 |
+  61 |     const fetchIcuPatients = async () => {
+  62 |         setLoading(true);  react-hooks/immutability
+  120:58  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/insurance/InsuranceDashboard.tsx
+   6:40  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   7:44  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  37:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/insurance/InsuranceDashboard.tsx:37:5
+  35 |
+  36 |   useEffect(() => {
+> 37 |     fetchClaims();
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |     fetchPatients();
+  39 |   }, []);
+  40 |  react-hooks/set-state-in-effect
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ipd/AdmissionForm.tsx
+  38:5  error  Error: Cannot access variable before it is declared
+
+`fetchData` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ipd/AdmissionForm.tsx:38:5
+  36 |
+  37 |   useEffect(() => {
+> 38 |     fetchData();
+     |     ^^^^^^^^^ `fetchData` accessed before it is declared
+  39 |   }, []);
+  40 |
+  41 |   async function fetchData() {
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ipd/AdmissionForm.tsx:41:3
+  39 |   }, []);
+  40 |
+> 41 |   async function fetchData() {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |     const { data: p } = await supabase.from("patients").select("*");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 43 |     const { data: d } = await supabase
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 54 |     setBeds(b || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |   }
+     | ^^^^ `fetchData` is declared here
+  56 |
+  57 |   const handleSubmit = async (e: React.FormEvent) => {
+  58 |     e.preventDefault();  react-hooks/immutability
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ipd/BedManagement.tsx
+  28:17  error    Error: Cannot access variable before it is declared
+
+`initialize25Beds` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ipd/BedManagement.tsx:28:17
+  26 |         fetchBeds().then(data => {
+  27 |             if (data && data.length === 0) {
+> 28 |                 initialize25Beds();
+     |                 ^^^^^^^^^^^^^^^^ `initialize25Beds` accessed before it is declared
+  29 |             }
+  30 |         });
+  31 |     }, []);
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ipd/BedManagement.tsx:33:5
+  31 |     }, []);
+  32 |
+> 33 |     const initialize25Beds = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 34 |         if (initializing) return;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |         setInitializing(true);
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |         setInitializing(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |     };
+     | ^^^^^^^ `initialize25Beds` is declared here
+  61 |
+  62 |     const wards = Array.from(new Set(beds.map(b => b.ward)));
+  63 |  react-hooks/immutability
+  31:8   warning  React Hook useEffect has a missing dependency: 'initialize25Beds'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react-hooks/exhaustive-deps
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ipd/IpdDashboard.tsx
+  35:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ipd/IpdDashboard.tsx:35:5
+  33 |
+  34 |   useEffect(() => {
+> 35 |     fetchAdmissions();
+     |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  36 |   }, []);
+  37 |
+  38 |   const admittedCount = admissions.filter(a => a.status === "Admitted").length;  react-hooks/set-state-in-effect
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/lab/LabDashboard.tsx
+  40:46  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  59:9   error  Error: Cannot access variable before it is declared
+
+`fetchOrders` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/lab/LabDashboard.tsx:59:9
+  57 |
+  58 |     useEffect(() => {
+> 59 |         fetchOrders();
+     |         ^^^^^^^^^^^ `fetchOrders` accessed before it is declared
+  60 |         fetchPatients();
+  61 |     }, []);
+  62 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/lab/LabDashboard.tsx:63:5
+  61 |     }, []);
+  62 |
+> 63 |     const fetchOrders = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 64 |         setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 65 |         const { data } = await supabase
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 66 |             .from("lab_orders")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 67 |             .select("*")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 68 |             .order("created_at", { ascending: false });
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |         setOrders(data || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |     };
+     | ^^^^^^^ `fetchOrders` is declared here
+  72 |
+  73 |     const fetchPatients = async () => {
+  74 |         const { data } = await supabase.from("patients").select("id, name").order("name");  react-hooks/immutability
+  60:9   error  Error: Cannot access variable before it is declared
+
+`fetchPatients` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/lab/LabDashboard.tsx:60:9
+  58 |     useEffect(() => {
+  59 |         fetchOrders();
+> 60 |         fetchPatients();
+     |         ^^^^^^^^^^^^^ `fetchPatients` accessed before it is declared
+  61 |     }, []);
+  62 |
+  63 |     const fetchOrders = async () => {
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/lab/LabDashboard.tsx:73:5
+  71 |     };
+  72 |
+> 73 |     const fetchPatients = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |         const { data } = await supabase.from("patients").select("id, name").order("name");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |         setPatients(data || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |     };
+     | ^^^^^^^ `fetchPatients` is declared here
+  77 |
+  78 |     const handleCreateOrder = async (e: React.FormEvent) => {
+  79 |         e.preventDefault();                                                                                                                                                                                     react-hooks/immutability
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/AppointmentForm.tsx
+  30:5  error  Error: Cannot access variable before it is declared
+
+`fetchPatients` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/AppointmentForm.tsx:30:5
+  28 |
+  29 |   useEffect(() => {
+> 30 |     fetchPatients();
+     |     ^^^^^^^^^^^^^ `fetchPatients` accessed before it is declared
+  31 |     fetchDoctors();
+  32 |   }, []);
+  33 |
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/AppointmentForm.tsx:34:3
+  32 |   }, []);
+  33 |
+> 34 |   const fetchPatients = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |     const { data } = await supabase
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 36 |       .from("patients")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 37 |       .select("*")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 38 |       .order("created_at", { ascending: false });
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |     setPatients(data || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |   };
+     | ^^^^^ `fetchPatients` is declared here
+  42 |
+  43 |   const fetchDoctors = async () => {
+  44 |     const { data } = await supabase                                                                             react-hooks/immutability
+  31:5  error  Error: Cannot access variable before it is declared
+
+`fetchDoctors` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/AppointmentForm.tsx:31:5
+  29 |   useEffect(() => {
+  30 |     fetchPatients();
+> 31 |     fetchDoctors();
+     |     ^^^^^^^^^^^^ `fetchDoctors` accessed before it is declared
+  32 |   }, []);
+  33 |
+  34 |   const fetchPatients = async () => {
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/AppointmentForm.tsx:43:3
+  41 |   };
+  42 |
+> 43 |   const fetchDoctors = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 44 |     const { data } = await supabase
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 45 |       .from("doctors")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |       .select("*")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |       .eq("is_active", true)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |       .order("name");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 49 |
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |     setDoctors(data || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 51 |   };
+     | ^^^^^ `fetchDoctors` is declared here
+  52 |
+  53 |   const createAppointment = async () => {
+  54 |     if (!selectedPatientId) {  react-hooks/immutability
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/OpdBillingModal.tsx
+   5:12  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+  12:44  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+  19:5   error  Error: Cannot access variable before it is declared
+
+`fetchFee` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/OpdBillingModal.tsx:19:5
+  17 |
+  18 |   useEffect(() => {
+> 19 |     fetchFee();
+     |     ^^^^^^^^ `fetchFee` accessed before it is declared
+  20 |   }, []);
+  21 |
+  22 |   const fetchFee = async () => {
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/OpdBillingModal.tsx:22:3
+  20 |   }, []);
+  21 |
+> 22 |   const fetchFee = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 23 |     const { data } = await supabase
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 24 |       .from("hospital_settings")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 25 |       .select("*")
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 26 |       .limit(1)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 27 |       .single();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 28 |
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 29 |     if (data) setConsultationFee(data.consultation_fee);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 30 |   };
+     | ^^^^^ `fetchFee` is declared here
+  31 |
+  32 |   const addService = () => {
+  33 |     setServices([...services, { service_name: "", quantity: 1, price: 0 }]);  react-hooks/immutability
+  36:63  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/OpdDashboard.tsx
+  45:5  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/opd/OpdDashboard.tsx:45:5
+  43 |
+  44 |   useEffect(() => {
+> 45 |     fetchAppointments();
+     |     ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  46 |   }, []);
+  47 |
+  48 |   const todayCount = appointments.length;  react-hooks/set-state-in-effect
+  46:6  warning  React Hook useEffect has a missing dependency: 'fetchAppointments'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ot/OtDashboard.tsx
+   5:46  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+   6:44  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  37:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/ot/OtDashboard.tsx:37:5
+  35 |
+  36 |   useEffect(() => {
+> 37 |     fetchSurgeries();
+     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |     fetchPatients();
+  39 |   }, []);
+  40 |  react-hooks/set-state-in-effect
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/patients/PatientList.tsx
+  33:10  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/patients/PatientList.tsx:33:10
+  31 |
+  32 |   useEffect(() => {
+> 33 |     void loadPatients();
+     |          ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |   }, []);
+  35 |
+  36 |   const filtered = useMemo(() => {  react-hooks/set-state-in-effect
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/pharmacy/PharmacyDashboard.tsx
+  77:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/shreyasv/akshaya-hms/akshaya-hms/src/modules/pharmacy/PharmacyDashboard.tsx:77:9
+  75 |
+  76 |     useEffect(() => {
+> 77 |         fetchMedicines();
+     |         ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  78 |         fetchDispenseHistory();
+  79 |         fetchPatients();
+  80 |         fetchDoctors();  react-hooks/set-state-in-effect
+
+✖ 71 problems (67 errors, 4 warnings)
+

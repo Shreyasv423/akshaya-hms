@@ -20,8 +20,6 @@ export default function BillingDashboard() {
 
     const fetchBills = async () => {
         setLoading(true);
-        // Fetch all bills from opd_bills table
-        // Join with patients to get the name for both OPD and IPD bills
         const { data: billsData, error } = await supabase
             .from("opd_bills")
             .select(`
@@ -30,6 +28,7 @@ export default function BillingDashboard() {
                 total_amount,
                 payment_mode,
                 created_at,
+                consultation_fee,
                 patients (name)
             `)
             .order("created_at", { ascending: false });
@@ -40,18 +39,31 @@ export default function BillingDashboard() {
             return;
         }
 
-        // Transform bills
-        const formattedBills: Bill[] = (billsData || []).map(b => ({
-            id: b.id,
-            patient_id: b.patient_id,
-            patient_name: (b as any).patients?.name || "Unknown Patient",
-            total_amount: b.total_amount,
-            payment_mode: b.payment_mode,
-            created_at: b.created_at,
-            // For now, if there's no consultation fee or if it's 0 it might be IPD, 
-            // but let's just keep it simple or check if we can distinguish
-            type: (b as any).consultation_fee > 0 ? "OPD" : "IPD"
-        }));
+        interface DBBill {
+            id: string;
+            patient_id: string;
+            total_amount: number;
+            payment_mode: string;
+            created_at: string;
+            consultation_fee?: number | null;
+            patients: { name: string } | { name: string }[] | null;
+        }
+
+        const formattedBills: Bill[] = ((billsData as unknown as DBBill[]) || []).map(b => {
+            const patientsVal = b.patients;
+            const patientName = patientsVal
+                ? (Array.isArray(patientsVal) ? patientsVal[0]?.name : patientsVal.name)
+                : "Unknown Patient";
+            return {
+                id: b.id,
+                patient_id: b.patient_id,
+                patient_name: patientName || "Unknown Patient",
+                total_amount: b.total_amount,
+                payment_mode: b.payment_mode,
+                created_at: b.created_at,
+                type: (b.consultation_fee ?? 0) > 0 ? "OPD" : "IPD"
+            };
+        });
 
         setBills(formattedBills);
         setLoading(false);
