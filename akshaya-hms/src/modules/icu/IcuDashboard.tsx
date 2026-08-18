@@ -304,6 +304,7 @@ export default function IcuDashboard() {
             {billingPatient && (
                 <IpdBillingModal
                     admission={billingPatient}
+                    source="ICU"
                     onClose={() => setBillingPatient(null)}
                     onSuccess={handleDischargeSuccess}
                 />

@@ -46,13 +46,30 @@ export default function GeneralSettings() {
 
   const handleSave = async () => {
     setSaving(true);
-    const { error } = await supabase
-      .from("hospital_settings")
-      .update({
-        ...settings,
-        updated_at: new Date().toISOString()
-      })
-      .neq("id", "");
+    
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, created_at, ...updateData } = settings as any;
+    
+    let error;
+    if (id) {
+        const res = await supabase
+            .from("hospital_settings")
+            .update({
+                ...updateData,
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", id);
+        error = res.error;
+    } else {
+        const res = await supabase
+            .from("hospital_settings")
+            .insert({
+                ...updateData,
+                updated_at: new Date().toISOString()
+            });
+        error = res.error;
+        if (!error) fetchSettings(); // refresh to get ID
+    }
 
     if (error) {
       alert("Error saving settings: " + error.message);

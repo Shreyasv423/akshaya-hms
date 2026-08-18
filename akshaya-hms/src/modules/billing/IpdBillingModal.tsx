@@ -14,6 +14,7 @@ type IpdAdmissionDetails = {
 
 type Props = {
     admission: IpdAdmissionDetails;
+    source?: "IPD" | "ICU";
     onClose: () => void;
     onSuccess: () => void;
 };
@@ -23,7 +24,7 @@ type AdditionalCharge = {
     amount: number | "";
 };
 
-export default function IpdBillingModal({ admission, onClose, onSuccess }: Props) {
+export default function IpdBillingModal({ admission, source = "IPD", onClose, onSuccess }: Props) {
     const [loading, setLoading] = useState(false);
     const [daysStayed, setDaysStayed] = useState(0);
     const [bedChargePerDay, setBedChargePerDay] = useState(0);
@@ -89,7 +90,9 @@ export default function IpdBillingModal({ admission, onClose, onSuccess }: Props
         }
 
         // 2. Update admission status
-        await supabase.from("ipd_admissions").update({ status: "Discharged" }).eq("id", admission.id);
+        if (source === "IPD") {
+            await supabase.from("ipd_admissions").update({ status: "Discharged" }).eq("id", admission.id);
+        }
 
         // 3. Free bed
         if (admission.bed_id) {
