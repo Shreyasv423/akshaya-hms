@@ -24,7 +24,7 @@ export default function ConsultationForm({
       .from("opd_consultations")
       .insert([
         {
-          appointment_id: appointmentId,
+          visit_id: appointmentId,   // DB column is visit_id, not appointment_id
           diagnosis,
           prescription,
           follow_up_date: followUp || null

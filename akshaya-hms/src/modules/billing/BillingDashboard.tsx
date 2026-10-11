@@ -72,16 +72,27 @@ export default function BillingDashboard() {
     useEffect(() => {
         fetchBills();
 
-        // Subscribe to real-time changes
+        let pollInterval: ReturnType<typeof setInterval> | null = null;
+
+        // Subscribe to real-time changes with graceful fallback for proxied environments (e.g. Vercel)
         const channel = supabase
             .channel('public:opd_bills')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'opd_bills' }, () => {
                 fetchBills();
             })
-            .subscribe();
+            .subscribe((status) => {
+                if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    // Proxies and serverless hosts lack WebSocket upgrade support; fall back to gentle polling
+                    void supabase.removeChannel(channel);
+                    if (!pollInterval) {
+                        pollInterval = setInterval(fetchBills, 30000);
+                    }
+                }
+            });
 
         return () => {
-            supabase.removeChannel(channel);
+            void supabase.removeChannel(channel);
+            if (pollInterval) clearInterval(pollInterval);
         };
     }, []);
 

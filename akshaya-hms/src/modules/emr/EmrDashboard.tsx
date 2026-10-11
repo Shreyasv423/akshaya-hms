@@ -5,7 +5,7 @@ import { Search, Activity, Stethoscope, Pill, FlaskConical, Calendar } from "luc
 type EMRPatient = {
   id: string;
   name: string;
-  uhid: string;
+  uhid?: string | null;
   phone: string;
   age?: number | null;
   gender?: string | null;
@@ -36,11 +36,11 @@ export default function EmrDashboard() {
     setTimeline([]);
 
     const searchVal = searchQuery.trim();
-    // 1. Search Patient
+    // 1. Search Patient by phone or name (uhid column does not exist on patients table)
     const { data: patientData, error: patientError } = await supabase
       .from("patients")
       .select("*")
-      .or(`phone.eq.${searchVal},uhid.eq.${searchVal}`);
+      .or(`phone.eq.${searchVal},name.ilike.%${searchVal}%`);
 
     if (patientError || !patientData || patientData.length === 0) {
       alert("Patient not found.");
@@ -82,7 +82,7 @@ export default function EmrDashboard() {
         date: i.admission_date,
         type: "ipd",
         title: "IPD Admission",
-        desc: `Admitted under Dr. ${i.attending_doctor}. Reason: ${i.reason_for_admission}. Status: ${i.status}`
+        desc: `Admitted under Dr. ${i.doctor_name || i.attending_doctor || "Doctor"}. Reason: ${i.diagnosis || i.reason_for_admission || "Medical Care"}. Status: ${i.status}`
       }));
     }
 
@@ -112,7 +112,7 @@ export default function EmrDashboard() {
         <form onSubmit={searchPatient} style={{ display: "flex", gap: 10 }}>
           <input
             style={{ flex: 1, padding: "10px 14px", border: "1px solid #cbd5e1", borderRadius: 8 }}
-            placeholder="Enter Patient Phone Number or UHID..."
+            placeholder="Enter Patient Phone Number or Name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -156,7 +156,11 @@ export default function EmrDashboard() {
               {patient.name?.charAt(0)}
             </div>
             <h3 style={{ margin: "0 0 4px 0", fontSize: 18 }}>{patient.name}</h3>
-            <p style={{ margin: "0 0 16px 0", color: "#64748b", fontSize: 14 }}>UHID: {patient.uhid}</p>
+            {patient.uhid ? (
+              <p style={{ margin: "0 0 16px 0", color: "#64748b", fontSize: 14 }}>UHID: {patient.uhid}</p>
+            ) : (
+              <p style={{ margin: "0 0 16px 0", color: "#64748b", fontSize: 14 }}>ID: #{patient.id.slice(0, 8)}</p>
+            )}
 
             <div style={{ display: "grid", gap: 12, fontSize: 14 }}>
               <div><strong style={{ color: "#94a3b8", display: "block", fontSize: 12 }}>Phone</strong> {patient.phone}</div>

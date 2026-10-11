@@ -11,12 +11,12 @@ export async function getCurrentUserRole(): Promise<string | null> {
     .from("profiles")
     .select("role")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Role fetch error:", error);
     return null;
   }
 
-  return data.role;
+  return data?.role ?? null;
 }

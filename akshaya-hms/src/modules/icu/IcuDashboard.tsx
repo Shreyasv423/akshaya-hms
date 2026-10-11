@@ -8,7 +8,7 @@ type IcuPatient = {
     patient_name: string;
     age: number | null;
     gender: string;
-    bed_id: string;
+    // bed_id does NOT exist in icu_patients table; bed is tracked via bed_number
     bed_number: string;
     doctor_name: string;
     diagnosis: string;
@@ -16,7 +16,7 @@ type IcuPatient = {
     pulse: string | null;
     spo2: string | null;
     temp: string | null;
-    status: "Critical" | "Stable" | "Improving";
+    status: "Critical" | "Stable" | "Improving" | "Discharged";
     admission_date: string;
     created_at: string;
 };
@@ -58,6 +58,8 @@ export default function IcuDashboard() {
         const { data } = await supabase
             .from("icu_patients")
             .select("*")
+            // Exclude discharged patients from the active ICU view
+            .neq("status", "Discharged")
             .order("created_at", { ascending: false });
         setPatients((data || []) as IcuPatient[]);
         setLoading(false);
@@ -73,13 +75,13 @@ export default function IcuDashboard() {
         if (!form.patient_id || !form.doctor_name || !form.bed_id || !form.diagnosis) return;
         setSaving(true);
         const patient = allPatients.find(p => p.id === form.patient_id);
+        // bed_id is NOT a column on icu_patients; only bed_number is stored
         const { error } = await supabase.from("icu_patients").insert({
             patient_id: form.patient_id,
             patient_name: patient?.name,
             age: patient?.age ?? null,
             gender: patient?.gender ?? "",
             doctor_name: form.doctor_name,
-            bed_id: form.bed_id,
             bed_number: form.bed_number,
             diagnosis: form.diagnosis,
             status: form.status,
@@ -87,6 +89,7 @@ export default function IcuDashboard() {
         });
 
         if (!error) {
+            // Mark the selected beds table row as occupied (uses beds.id)
             await supabase.from("beds").update({ is_occupied: true }).eq("id", form.bed_id);
             setForm({ patient_id: "", doctor_name: "", bed_id: "", bed_number: "", diagnosis: "", status: "Critical" });
             setShowForm(false);
@@ -123,7 +126,19 @@ export default function IcuDashboard() {
 
     const handleDischargeSuccess = async () => {
         if (billingPatient) {
-            await supabase.from("icu_patients").delete().eq("id", billingPatient.id);
+            // Soft-discharge: mark status as Discharged instead of hard-deleting.
+            // This preserves the record for EMR history and billing audit trail.
+            await supabase
+                .from("icu_patients")
+                .update({ status: "Discharged" })
+                .eq("id", billingPatient.id);
+
+            // Free the bed using bed_number (since icu_patients has no bed_id column)
+            await supabase
+                .from("beds")
+                .update({ is_occupied: false })
+                .eq("bed_number", billingPatient.bed_number);
+
             fetchIcuPatients();
             setBillingPatient(null);
         }

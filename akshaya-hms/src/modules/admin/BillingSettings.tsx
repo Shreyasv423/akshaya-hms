@@ -26,13 +26,22 @@ export default function GeneralSettings() {
 
   const fetchSettings = async () => {
     setLoading(true);
-    const { data } = await supabase.from("hospital_settings").select("*").single();
-    if (data) {
-      setSettings({
-        ...settings,
-        ...data,
-        bed_charges: data.bed_charges || settings.bed_charges
-      });
+    try {
+      // 1. Load any cached profile & bed charge settings
+      const local = localStorage.getItem("akshaya_hospital_settings");
+      const localData = local ? JSON.parse(local) : null;
+
+      // 2. Fetch from Supabase using maybeSingle() to avoid PGRST116 when empty
+      const { data } = await supabase.from("hospital_settings").select("*").maybeSingle();
+      
+      setSettings(prev => ({
+        ...prev,
+        ...(localData || {}),
+        ...(data || {}),
+        bed_charges: (data && data.bed_charges) || (localData && localData.bed_charges) || prev.bed_charges
+      }));
+    } catch (err) {
+      console.warn("Could not load hospital settings:", err);
     }
     setLoading(false);
   };
@@ -47,32 +56,64 @@ export default function GeneralSettings() {
   const handleSave = async () => {
     setSaving(true);
     
+    // Always persist full configuration locally
+    localStorage.setItem("akshaya_hospital_settings", JSON.stringify(settings));
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, created_at, ...updateData } = settings as any;
+    const { id, created_at, ...updateData } = settings as Record<string, unknown>;
     
-    let error;
-    if (id) {
+    let error: { message: string } | Error | null = null;
+    try {
+      if (id) {
+        // Try updating full data
         const res = await supabase
+          .from("hospital_settings")
+          .update({
+            ...updateData,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", id as string);
+        
+        // If column mismatch occurs (PostgreSQL 42703), fall back to consultation_fee only
+        if (res.error && res.error.code === "42703") {
+          const fallbackRes = await supabase
             .from("hospital_settings")
             .update({
-                ...updateData,
-                updated_at: new Date().toISOString()
+              consultation_fee: settings.consultation_fee,
+              updated_at: new Date().toISOString()
             })
-            .eq("id", id);
-        error = res.error;
-    } else {
+            .eq("id", id as string);
+          error = fallbackRes.error;
+        } else {
+          error = res.error;
+        }
+      } else {
         const res = await supabase
+          .from("hospital_settings")
+          .insert({
+            ...updateData,
+            updated_at: new Date().toISOString()
+          });
+
+        if (res.error && res.error.code === "42703") {
+          const fallbackRes = await supabase
             .from("hospital_settings")
             .insert({
-                ...updateData,
-                updated_at: new Date().toISOString()
+              consultation_fee: settings.consultation_fee,
+              updated_at: new Date().toISOString()
             });
-        error = res.error;
-        if (!error) fetchSettings(); // refresh to get ID
+          error = fallbackRes.error;
+        } else {
+          error = res.error;
+        }
+        if (!error) fetchSettings();
+      }
+    } catch (err: unknown) {
+      error = err instanceof Error ? err : new Error(String(err));
     }
 
     if (error) {
-      alert("Error saving settings: " + error.message);
+      alert("Error saving settings to cloud: " + error.message + " (Settings saved locally)");
     } else {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);

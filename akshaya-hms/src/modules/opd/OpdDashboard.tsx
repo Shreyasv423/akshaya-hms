@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
 import AppointmentForm from "./AppointmentForm";
 import AppointmentList from "./AppointmentList";
@@ -21,7 +21,7 @@ export default function OpdDashboard() {
 
   const today = new Date().toISOString().split("T")[0];
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     setLoading(true);
 
     // Bug fix: filter by today's date so token numbers reset daily
@@ -39,11 +39,11 @@ export default function OpdDashboard() {
 
     setAppointments(data || []);
     setLoading(false);
-  };
+  }, [today]);
 
   useEffect(() => {
     fetchAppointments();
-  }, []);
+  }, [fetchAppointments]);
 
   const todayCount = appointments.length;
   const waitingCount = appointments.filter(a => a.status === "Waiting").length;

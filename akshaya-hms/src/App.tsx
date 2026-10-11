@@ -51,32 +51,42 @@ export default function App() {
 
   /* ---------- Auth ---------- */
   useEffect(() => {
-    // Safety fallback for mobile
+    // Safety fallback for mobile network hangs
     const fallback = setTimeout(() => {
       setInitialised(true);
-    }, 6000);
+    }, 3000);
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      if (!s) {
+    supabase.auth
+      .getSession()
+      .then(({ data: { session: s } }) => {
+        setSession(s);
+        if (!s) {
+          setInitialised(true);
+          clearTimeout(fallback);
+          return;
+        }
+        supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", s.user.id)
+          .maybeSingle()
+          .then(
+            ({ data }) => {
+              if (data?.role) setRole(data.role);
+              setInitialised(true);
+              clearTimeout(fallback);
+            },
+            () => {
+              setInitialised(true);
+              clearTimeout(fallback);
+            }
+          );
+      })
+      .catch((err) => {
+        console.warn("Auth session check error:", err);
         setInitialised(true);
         clearTimeout(fallback);
-        return;
-      }
-      supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", s.user.id)
-        .single()
-        .then(({ data }) => {
-          if (data?.role) setRole(data.role);
-          setInitialised(true);
-          clearTimeout(fallback);
-        }, () => {
-          setInitialised(true);
-          clearTimeout(fallback);
-        });
-    });
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       if (event === "SIGNED_OUT") {
@@ -84,10 +94,18 @@ export default function App() {
         setRole("reception");
       } else if (event === "SIGNED_IN" && s) {
         setSession(s);
-        supabase.from("profiles").select("role").eq("id", s.user.id).single().then(({ data }) => {
-          if (data?.role) setRole(data.role);
-          setInitialised(true);
-        }, () => setInitialised(true));
+        supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", s.user.id)
+          .maybeSingle()
+          .then(
+            ({ data }) => {
+              if (data?.role) setRole(data.role);
+              setInitialised(true);
+            },
+            () => setInitialised(true)
+          );
       }
     });
 

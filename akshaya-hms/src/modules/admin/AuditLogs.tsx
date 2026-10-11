@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
 
 type AuditLog = {
@@ -19,7 +19,7 @@ export default function AuditLogs() {
   const [newAction, setNewAction] = useState("");
   const [newDetails, setNewDetails] = useState("");
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -39,11 +39,11 @@ export default function AuditLogs() {
       setLogs([]);
     }
     setLoading(false);
-  };
+  }, [activeTab]);
 
   useEffect(() => {
     fetchLogs();
-  }, [activeTab]);
+  }, [fetchLogs]);
 
   const handleAddLog = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -86,7 +86,7 @@ export default function HrDashboard() {
             return "reception"; // Nurse, Receptionist, etc. all get reception view or fallback
         };
 
-        const payload: any = {
+        const payload: Record<string, unknown> = {
             name: form.name.trim(),
             role: form.role,
             department: form.department,

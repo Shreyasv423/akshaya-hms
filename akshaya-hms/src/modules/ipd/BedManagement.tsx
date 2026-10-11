@@ -22,7 +22,8 @@ export default function BedManagement() {
         try {
             const [{ data: ipdActive }, { data: icuActive }] = await Promise.all([
                 supabase.from("ipd_admissions").select("bed_id").eq("status", "Admitted"),
-                supabase.from("icu_patients").select("bed_id, bed_number")
+                // icu_patients has no bed_id column; only bed_number is stored
+                supabase.from("icu_patients").select("bed_number").neq("status", "Discharged")
             ]);
 
             const activeBedIds = new Set<string>();
@@ -32,7 +33,6 @@ export default function BedManagement() {
                 if (a.bed_id) activeBedIds.add(a.bed_id);
             });
             (icuActive || []).forEach(i => {
-                if (i.bed_id) activeBedIds.add(i.bed_id);
                 if (i.bed_number) activeBedNumbers.add(i.bed_number);
             });
 
@@ -86,11 +86,12 @@ export default function BedManagement() {
     };
 
     useEffect(() => {
-        fetchBeds().then(data => {
+        void fetchBeds().then(data => {
             if (data && data.length === 0) {
-                initialize25Beds();
+                void initialize25Beds();
             }
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const wards = Array.from(new Set(beds.map(b => b.ward)));

@@ -5,6 +5,7 @@ import { supabase } from "../../services/supabase";
 import PatientForm from "../patients/PatientForm";
 import AppointmentForm from "../opd/AppointmentForm";
 import AppointmentList from "../opd/AppointmentList";
+import type { Appointment } from "../opd/OpdDashboard";
 
 type Patient = {
     id: string;
@@ -12,14 +13,6 @@ type Patient = {
     age: number;
     gender: string;
     phone?: string;
-};
-
-type Appointment = {
-    id: string;
-    patient_name: string;
-    doctor_name: string;
-    token_number: number;
-    status: string;
 };
 
 export default function FrontDeskDashboard() {
@@ -216,7 +209,7 @@ export default function FrontDeskDashboard() {
                             <div style={emptyState}>Loading appointments...</div>
                         ) : (
                             <AppointmentList
-                                appointments={appointments as any}
+                                appointments={appointments}
                                 refresh={fetchAppointments}
                             />
                         )}
