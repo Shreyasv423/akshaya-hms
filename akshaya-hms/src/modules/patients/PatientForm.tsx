@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../../services/supabase";
+import { generateUHID } from "../../utils/patient";
 
 export default function PatientForm({
   onAdded
@@ -10,6 +11,7 @@ export default function PatientForm({
   const [age, setAge] = useState<number | "">("");
   const [gender, setGender] = useState("Male");
   const [phone, setPhone] = useState("");
+  const [uhid, setUhid] = useState(generateUHID());
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -22,26 +24,35 @@ export default function PatientForm({
 
     setLoading(true);
 
-    const { error } = await supabase.from("patients").insert([
-      {
-        name: name.trim(),
-        age: age === "" ? null : Number(age),
-        gender,
-        phone: phone || null
-      }
-    ]);
+    const basePayload = {
+      name: name.trim(),
+      age: age === "" ? null : Number(age),
+      gender,
+      phone: phone.trim() || null
+    };
 
-    if (error) {
-      alert(error.message);
+    // Try saving with UHID first
+    let res = await supabase.from("patients").insert([{ ...basePayload, uhid }]);
+
+    // If PostgreSQL column uhid doesn't exist (error 42703), safely fallback to basePayload
+    if (res.error && res.error.code === "42703") {
+      res = await supabase.from("patients").insert([basePayload]);
+    }
+
+    if (res.error) {
+      alert("Error adding patient: " + res.error.message);
       setLoading(false);
       return;
     }
+
+    alert(`Patient ${name.trim()} registered successfully with ID: ${uhid}`);
 
     /* Reset */
     setName("");
     setAge("");
     setPhone("");
     setGender("Male");
+    setUhid(generateUHID());
     setLoading(false);
 
     onAdded();
@@ -49,46 +60,64 @@ export default function PatientForm({
 
   return (
     <div style={cardStyle}>
-      <h3 style={headingStyle}>Add New Patient</h3>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h3 style={{ ...headingStyle, margin: 0 }}>Add New Patient</h3>
+        <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "6px 12px", borderRadius: 8, fontSize: 13, color: "#166534", fontWeight: 600 }}>
+          Assigned ID: {uhid}
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} style={formStyle}>
+        <div>
+          <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 4 }}>Patient ID / UHID (Auto-generated)</label>
+          <input
+            style={{ ...inputStyle, background: "#f8fafc", fontWeight: 600, color: "#0369a1" }}
+            value={uhid}
+            onChange={e => setUhid(e.target.value.toUpperCase())}
+            placeholder="Unique Health ID"
+            required
+          />
+        </div>
+
         <input
           style={inputStyle}
-          placeholder="Patient Name"
+          placeholder="Patient Name *"
           value={name}
           onChange={e => setName(e.target.value)}
           required
         />
 
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <input
+            style={inputStyle}
+            placeholder="Age"
+            type="number"
+            value={age}
+            onChange={e =>
+              setAge(e.target.value === "" ? "" : Number(e.target.value))
+            }
+          />
+
+          <select
+            style={inputStyle}
+            value={gender}
+            onChange={e => setGender(e.target.value)}
+          >
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
         <input
           style={inputStyle}
-          placeholder="Age"
-          type="number"
-          value={age}
-          onChange={e =>
-            setAge(e.target.value === "" ? "" : Number(e.target.value))
-          }
-        />
-
-        <select
-          style={inputStyle}
-          value={gender}
-          onChange={e => setGender(e.target.value)}
-        >
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
-
-        <input
-          style={inputStyle}
-          placeholder="Phone Number"
+          placeholder="Phone Number (e.g. 9876543210)"
           value={phone}
           onChange={e => setPhone(e.target.value)}
         />
 
         <button type="submit" style={buttonStyle} disabled={loading}>
-          {loading ? "Saving..." : "Save Patient"}
+          {loading ? "Saving Patient..." : `Register Patient (${uhid})`}
         </button>
       </form>
     </div>

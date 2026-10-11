@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
+import { formatPatientOption, getPatientIdentifier, type BasePatient } from "../../utils/patient";
 
 type Props = {
   onSuccess: () => void;
 };
 
-type Patient = {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-};
+type Patient = BasePatient;
 
 type Doctor = {
   id: string;
@@ -25,6 +21,7 @@ type Bed = {
 
 export default function AdmissionForm({ onSuccess }: Props) {
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [patientFilter, setPatientFilter] = useState("");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [beds, setBeds] = useState<Bed[]>([]);
   const [loading, setLoading] = useState(false);
@@ -107,12 +104,32 @@ export default function AdmissionForm({ onSuccess }: Props) {
       <h3 style={title}>Admit Patient</h3>
 
       <form onSubmit={handleSubmit} style={form}>
-        <select value={patientId} onChange={e => setPatientId(e.target.value)} style={input} required>
-          <option value="">Select Patient</option>
-          {patients.map(p => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
+        <div>
+          <input
+            type="text"
+            placeholder="🔍 Filter patient by Name, ID (PID-...), or Phone..."
+            value={patientFilter}
+            onChange={(e) => setPatientFilter(e.target.value)}
+            style={{ ...input, marginBottom: 6, fontSize: 13 }}
+          />
+          <select value={patientId} onChange={e => setPatientId(e.target.value)} style={input} required>
+            <option value="">-- Select Patient ({patients.length} available) --</option>
+            {patients
+              .filter((p) => {
+                if (!patientFilter.trim()) return true;
+                const q = patientFilter.toLowerCase();
+                const pid = getPatientIdentifier(p).toLowerCase();
+                return (
+                  p.name.toLowerCase().includes(q) ||
+                  pid.includes(q) ||
+                  (p.phone && p.phone.includes(q))
+                );
+              })
+              .map(p => (
+                <option key={p.id} value={p.id}>{formatPatientOption(p)}</option>
+              ))}
+          </select>
+        </div>
 
         <select value={doctorId} onChange={e => setDoctorId(e.target.value)} style={input} required>
           <option value="">Select Doctor</option>

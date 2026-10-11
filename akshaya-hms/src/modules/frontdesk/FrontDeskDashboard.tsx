@@ -6,14 +6,9 @@ import PatientForm from "../patients/PatientForm";
 import AppointmentForm from "../opd/AppointmentForm";
 import AppointmentList from "../opd/AppointmentList";
 import type { Appointment } from "../opd/OpdDashboard";
+import { getPatientIdentifier, type BasePatient } from "../../utils/patient";
 
-type Patient = {
-    id: string;
-    name: string;
-    age: number;
-    gender: string;
-    phone?: string;
-};
+type Patient = BasePatient;
 
 export default function FrontDeskDashboard() {
     const [activeTab, setActiveTab] = useState<"patients" | "opd">("patients");
@@ -60,11 +55,16 @@ export default function FrontDeskDashboard() {
         setActiveTab("opd");
     };
 
-    const filteredPatients = patients.filter(p =>
-        !searchPatient ||
-        p.name.toLowerCase().includes(searchPatient.toLowerCase()) ||
-        p.phone?.includes(searchPatient)
-    );
+    const filteredPatients = patients.filter(p => {
+        if (!searchPatient.trim()) return true;
+        const q = searchPatient.toLowerCase().trim();
+        const pid = getPatientIdentifier(p).toLowerCase();
+        return (
+            p.name.toLowerCase().includes(q) ||
+            pid.includes(q) ||
+            (p.phone && p.phone.includes(q))
+        );
+    });
 
     return (
         <div style={container}>
@@ -126,7 +126,7 @@ export default function FrontDeskDashboard() {
                         <div style={actionRow}>
                             <input
                                 style={searchInput}
-                                placeholder="🔍 Search patient by name or phone..."
+                                placeholder="🔍 Search patient by Name, Phone, or Patient ID (PID-...)..."
                                 value={searchPatient}
                                 onChange={e => setSearchPatient(e.target.value)}
                             />
@@ -155,6 +155,7 @@ export default function FrontDeskDashboard() {
                                     <table style={table}>
                                         <thead>
                                             <tr style={thead}>
+                                                <th style={th}>Patient ID</th>
                                                 <th style={th}>Name</th>
                                                 <th style={th}>Age/Gender</th>
                                                 <th style={th}>Phone</th>
@@ -164,6 +165,11 @@ export default function FrontDeskDashboard() {
                                         <tbody>
                                             {filteredPatients.map(p => (
                                                 <tr key={p.id} style={tr}>
+                                                    <td style={td}>
+                                                        <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700, fontFamily: "monospace" }}>
+                                                            {getPatientIdentifier(p)}
+                                                        </span>
+                                                    </td>
                                                     <td style={{ ...td, fontWeight: 600 }}>{p.name}</td>
                                                     <td style={td}>{p.age || "—"} / {p.gender}</td>
                                                     <td style={{ ...td, color: "#64748b" }}>{p.phone || "—"}</td>

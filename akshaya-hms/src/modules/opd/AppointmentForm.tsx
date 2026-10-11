@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
+import { formatPatientOption, getPatientIdentifier, type BasePatient } from "../../utils/patient";
 
 type Props = {
   onSuccess: () => void;
   initialPatientId?: string | null;
 };
 
-type Patient = {
-  id: string;
-  name: string;
-  phone?: string;
-  age?: number;
-};
+type Patient = BasePatient;
 
 type Doctor = {
   id: string;
@@ -21,6 +17,7 @@ type Doctor = {
 
 export default function AppointmentForm({ onSuccess, initialPatientId }: Props) {
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [patientFilter, setPatientFilter] = useState("");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState(initialPatientId || "");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -32,7 +29,7 @@ export default function AppointmentForm({ onSuccess, initialPatientId }: Props) 
       .select("*")
       .order("created_at", { ascending: false });
 
-    setPatients(data || []);
+    setPatients((data || []) as Patient[]);
   };
 
   const fetchDoctors = async () => {
@@ -119,18 +116,36 @@ export default function AppointmentForm({ onSuccess, initialPatientId }: Props) 
       <div style={grid}>
         {/* Patient */}
         <div style={field}>
-          <label style={label}>Patient</label>
+          <label style={label}>Patient (Search by ID, Name, or Phone)</label>
+          <input
+            type="text"
+            placeholder="🔍 Filter by Name, Patient ID (PID-...), or Phone..."
+            value={patientFilter}
+            onChange={(e) => setPatientFilter(e.target.value)}
+            style={{ ...input, marginBottom: 6, fontSize: 13 }}
+          />
           <select
             value={selectedPatientId}
             onChange={(e) => setSelectedPatientId(e.target.value)}
             style={input}
           >
-            <option value="">Select Patient</option>
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}{p.phone ? ` — ${p.phone}` : ""}
-              </option>
-            ))}
+            <option value="">-- Select Patient ({patients.length} available) --</option>
+            {patients
+              .filter((p) => {
+                if (!patientFilter.trim()) return true;
+                const q = patientFilter.toLowerCase();
+                const pid = getPatientIdentifier(p).toLowerCase();
+                return (
+                  p.name.toLowerCase().includes(q) ||
+                  pid.includes(q) ||
+                  (p.phone && p.phone.includes(q))
+                );
+              })
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {formatPatientOption(p)}
+                </option>
+              ))}
           </select>
         </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
 import IpdBillingModal from "../billing/IpdBillingModal";
+import { formatPatientOption, getPatientIdentifier, type BasePatient } from "../../utils/patient";
 
 type IcuPatient = {
     id: string;
@@ -23,7 +24,8 @@ type IcuPatient = {
 
 export default function IcuDashboard() {
     const [patients, setPatients] = useState<IcuPatient[]>([]);
-    const [allPatients, setAllPatients] = useState<{ id: string; name: string; age: number | null; gender: string }[]>([]);
+    const [allPatients, setAllPatients] = useState<BasePatient[]>([]);
+    const [patientFilter, setPatientFilter] = useState("");
     const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([]);
     const [beds, setBeds] = useState<{ id: string; bed_number: string; ward: string }[]>([]);
     const [loading, setLoading] = useState(false);
@@ -44,11 +46,11 @@ export default function IcuDashboard() {
 
     const fetchDropdownData = async () => {
         const [{ data: p }, { data: d }, { data: b }] = await Promise.all([
-            supabase.from("patients").select("id, name, age, gender").order("name"),
+            supabase.from("patients").select("id, name, age, gender, phone").order("name"),
             supabase.from("doctors").select("id, name").eq("is_active", true).order("name"),
             supabase.from("beds").select("id, bed_number, ward").eq("is_occupied", false)
         ]);
-        setAllPatients(p || []);
+        setAllPatients((p || []) as BasePatient[]);
         setDoctors(d || []);
         setBeds((b || []).filter(bed => bed.ward.toLowerCase().includes("icu")));
     };
@@ -175,10 +177,31 @@ export default function IcuDashboard() {
                     <h3 style={formTitle}>🏥 Admit to ICU</h3>
                     <form onSubmit={handleAdmit} style={formGrid}>
                         <div style={fieldStyle}>
-                            <label style={lbl}>Patient</label>
+                            <label style={lbl}>Patient (Search by ID, Name, Phone)</label>
+                            <input
+                                style={{ ...inp, marginBottom: 6, fontSize: 13 }}
+                                placeholder="🔍 Filter patient by Name, ID, Phone..."
+                                value={patientFilter}
+                                onChange={e => setPatientFilter(e.target.value)}
+                            />
                             <select style={inp} value={form.patient_id} onChange={e => setForm({ ...form, patient_id: e.target.value })} required>
-                                <option value="">Select Patient</option>
-                                {allPatients.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                <option value="">-- Select Patient ({allPatients.length} available) --</option>
+                                {allPatients
+                                    .filter(p => {
+                                        if (!patientFilter.trim()) return true;
+                                        const q = patientFilter.toLowerCase();
+                                        const pid = getPatientIdentifier(p).toLowerCase();
+                                        return (
+                                            p.name.toLowerCase().includes(q) ||
+                                            pid.includes(q) ||
+                                            (p.phone && p.phone.includes(q))
+                                        );
+                                    })
+                                    .map(p => (
+                                        <option key={p.id} value={p.id}>
+                                            {formatPatientOption(p)}
+                                        </option>
+                                    ))}
                             </select>
                         </div>
                         <div style={fieldStyle}>

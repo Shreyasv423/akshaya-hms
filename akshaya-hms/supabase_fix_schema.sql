@@ -27,6 +27,10 @@ BEGIN
     ALTER TABLE public.hospital_settings ADD COLUMN IF NOT EXISTS gst_percent NUMERIC DEFAULT 0;
     ALTER TABLE public.hospital_settings ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'INR';
     ALTER TABLE public.hospital_settings ADD COLUMN IF NOT EXISTS bed_charges JSONB DEFAULT '{"General Ward": 800, "Semi-Private": 1500, "Private": 3000, "ICU": 5000}'::jsonb;
+    
+    -- Ensure patients table has uhid column and index for fast lookup
+    ALTER TABLE public.patients ADD COLUMN IF NOT EXISTS uhid TEXT;
+    CREATE INDEX IF NOT EXISTS idx_patients_uhid ON public.patients (uhid);
 EXCEPTION
     WHEN others THEN NULL;
 END $$;
